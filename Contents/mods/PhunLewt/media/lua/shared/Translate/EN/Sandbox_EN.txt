@@ -1,0 +1,7 @@
+
+Sandbox_EN = {
+    Sandbox_PhunLewt = "PhunLewt",
+    
+    Sandbox_PhunLewt_MaxGameHoursForEmptyContainer = "Max hours for empty container"
+    Sandbox_PhunLewt_MaxGameHoursForEmptyContainer_tooltip = "Attempts to trigger container refill if it has been empty for longer than this many hours",
+}

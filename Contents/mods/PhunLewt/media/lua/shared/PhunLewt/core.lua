@@ -1,0 +1,38 @@
+require "PhunLib/core"
+
+PhunLewt = {
+    name = "PhunLewt",
+    consts = {
+        itemType = {
+            items = "items"
+        }
+    },
+    data = {},
+    commands = {
+        playerSetup = "playerSetup",
+        refillContainer = "refillContainer"
+    },
+    events = {
+        onReady = "PhunLewtOnReady"
+    },
+    settings = {},
+    ui = {}
+}
+
+local Core = PhunLewt
+local PL = PhunLib
+Core.isLocal = not isClient() and not isServer() and not isCoopHost()
+Core.settings = SandboxVars[Core.name] or {}
+for _, event in pairs(Core.events) do
+    if not Events[event] then
+        LuaEventManager.AddEvent(event)
+    end
+end
+
+function Core:ini()
+    self.inied = true
+    if not isClient() then
+
+    end
+    triggerEvent(self.events.OnReady, self)
+end
