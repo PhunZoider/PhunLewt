@@ -119,35 +119,6 @@ function UI:createChildren()
 
     self.controls = {}
 
-    -- local panel = ISPanel:new(x, y, w, h);
-    -- panel:initialise();
-    -- panel:instantiate();
-    -- panel:setAnchorLeft(true);
-    -- panel:setAnchorRight(true);
-    -- panel:setAnchorTop(true);
-    -- panel:setAnchorBottom(true);
-
-    -- self:addChild(panel);
-    -- self.controls._panel = panel;
-
-    -- self.controls.tabPanel = ISTabPanel:new(x, y, w, h - y - (padding * 2) - tools.BUTTON_HGT);
-    -- self.controls.tabPanel:initialise()
-    -- self.controls.tabPanel:instantiate()
-    -- self.controls.tabPanel:setAnchorLeft(true)
-    -- self.controls.tabPanel:setAnchorRight(true)
-    -- self.controls.tabPanel:setAnchorTop(true)
-    -- self.controls.tabPanel:setAnchorBottom(true)
-    -- panel:addChild(self.controls.tabPanel)
-
-    -- h = self.controls.tabPanel.height - (tools.HEADER_HGT - 5)
-
-    -- self.controls.items = Core.ui.group:new(0, 0, w, h, {
-    --     player = self.player,
-    --     type = Core.consts.itemType.items
-    -- });
-
-    -- self.controls.tabPanel:addView(Core.consts.itemType.items, self.controls.items)
-
     self.controls.ok = ISButton:new(padding, self.height - rh - padding - tools.FONT_HGT_SMALL, 100,
         tools.FONT_HGT_SMALL + 4, "OK", self, UI.onOK);
     self.controls.ok:initialise();
@@ -162,12 +133,6 @@ function UI:createChildren()
         type = Core.consts.itemType.items
     });
 
-    -- self.controls.tabPanel = ISTabPanel:new(x, y, w, self.controls.ok.y - y - padding - tools.HEADER_HGT);
-    -- self.controls.tabPanel:initialise()
-    -- self.controls.tabPanel:setAnchorLeft(true)
-    -- self.controls.tabPanel:setAnchorRight(true)
-    -- self.controls.tabPanel:setAnchorTop(true)
-    -- self.controls.tabPanel:setAnchorBottom(true)
     self:addChild(self.controls.tabPanel)
 
     self.controls.categories = Core.ui.cats:new(0, y, w, self.controls.tabPanel.height, {
@@ -214,9 +179,10 @@ end
 
 function UI:onOK()
     local data = self.data
+    local selectedItems = self.controls.items:getData()
     local selected = {
-        categories = self.controls.categories.data.selected or {},
-        items = self.controls.items.data.selected or {}
+        categories = self.controls.categories:getData(),
+        items = self.controls.items:getData()
     }
     self.cb(selected)
     self:close()

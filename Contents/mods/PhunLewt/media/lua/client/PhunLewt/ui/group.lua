@@ -120,6 +120,5 @@ function UI:setData(data)
 end
 function UI:refreshAll()
     self.categories:setData(self.data.categories)
-    self.items:setData(self.data.include)
-
+    self.items:setData(self.data.items)
 end

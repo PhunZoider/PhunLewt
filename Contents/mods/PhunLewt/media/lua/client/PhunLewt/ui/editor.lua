@@ -160,23 +160,49 @@ end
 
 function UI:setZoneData(data)
 
-    self.selectedZoneData = data
-    self:refreshProperties(data)
+    local regionKey = data and data.region or nil
+    local zoneKey = data and data.zone or nil
+
+    local global = self.data or {}
+    local region = regionKey and data[regionKey] or {}
+    local zone = zoneKey and region[zoneKey] or {}
+
+    if not zone.categories then
+        zone.categories = {}
+    end
+    if not zone.items then
+        zone.items = {}
+    end
+
+    self.selectedRegion = regionKey
+    self.selectedZone = zoneKey
+    self.selectedData = zone
+    self:refreshSelected(data)
 
 end
 
-function UI:refreshProperties(data, selected)
-    self.selectedProperty = nil
+function UI:getZoneData()
+    local global = self.data or {}
+    local region = self.regionKey and data[self.regionKey] or {}
+    local zone = self.zoneKey and region[self.zoneKey] or {}
+
+    if not zone.categories then
+        zone.categories = {}
+    end
+    if not zone.items then
+        zone.items = {}
+    end
+    return zone
+end
+
+function UI:refreshSelected(data)
+
     self.controls.list:clear()
     if not data then
         return
     end
-    local zone = self.zones.zones[data.region].zones[data.zone]
     for k, v in pairs(data) do
-        if k ~= "region" and k ~= "zone" and k ~= "zones" then
 
-            -- is this value overwriting the parent?
-        end
     end
 
 end
@@ -239,9 +265,32 @@ function UI:createChildren()
     self:addChild(selectorTitle);
 
     local selector = ISButton:new(self.width - 200 - padding, y, 200, tools.BUTTON_HGT, " ... ", self, function()
-        Core.ui.filters.open(self.player, self.data.filters or {}, function(data)
+        -- get currently selected zone
+        local regionKey = self.selectedRegion
+        local zoneKey = self.selectedZone
+
+        local data = nil
+        if regionKey then
+            data = self.data[regionKey] or {}
+        end
+        if zoneKey then
+            data = self.data[regionKey] and self.data[regionKey][zoneKey] or {}
+        end
+        if not data then
+            data = self.data["GLOBAL"] or {}
+        end
+        local existing = PL.table.deepCopy(data)
+
+        Core.ui.filters.open(self.player, existing, function(data)
             local s = self
-            s.data.filters = data
+            if regionKey and zoneKey then
+                s.data[regionKey] = s.data[regionKey] or {}
+                s.data[regionKey][zoneKey] = data
+            elseif regionKey then
+                s.data[regionKey] = data
+            else
+                s.data["GLOBAL"] = data
+            end
             s:setData(s:getData())
         end)
     end);
@@ -332,7 +381,6 @@ function UI:clearSelectedChance()
             list.items[i].item.chance = nil
         end
     end
-
 end
 
 function UI:click(x, y)
@@ -464,7 +512,7 @@ function UI:prerender()
 end
 
 function UI:onOK()
-    self.cb(self.controls.items:getSelected())
+    self.cb(self:getData())
     self:close()
 end
 
