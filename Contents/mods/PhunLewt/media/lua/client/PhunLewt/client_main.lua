@@ -74,3 +74,10 @@ function Core:checkRemoveItems(inventoryPage)
     end
 
 end
+
+function Core.editZoneData(player, data)
+    Core.ui.editor.open(player, data, function(zone)
+        local s = self
+        s:setData({})
+    end)
+end

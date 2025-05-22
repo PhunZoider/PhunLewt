@@ -17,3 +17,11 @@ Events.OnRefreshInventoryWindowContainers.Add(function(page, state)
         Core:checkRemoveItems(page)
     end
 end);
+
+Events.OnServerCommand.Add(function(module, command, arguments)
+    if module == Core.name then
+        if Commands[command] then
+            Commands[command](arguments)
+        end
+    end
+end)

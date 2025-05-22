@@ -10,7 +10,9 @@ PhunLewt = {
     data = {},
     commands = {
         playerSetup = "playerSetup",
-        refillContainer = "refillContainer"
+        refillContainer = "refillContainer",
+        requestZoneData = "requestZoneData",
+        saveZoneData = "saveZoneData"
     },
     events = {
         onReady = "PhunLewtOnReady"

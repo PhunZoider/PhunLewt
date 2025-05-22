@@ -1,0 +1,5 @@
+IGUI_EN = {
+    IGUI_PhunLewt_Lewt = "Lewt",
+    IGUI_PhunLewt_Lewt_tooltip = "Custom lewt reduction settings for zone",
+    IGUI_PhunLewt_DisabledOnNew_tooltip = "You can only modify once zone has saved",
+}

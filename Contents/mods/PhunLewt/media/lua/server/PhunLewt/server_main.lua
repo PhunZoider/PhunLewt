@@ -72,3 +72,6 @@ function Core:removeItemsFromContainer(container)
     end
 end
 
+function Core:getZoneData(region, zone)
+    return {}
+end

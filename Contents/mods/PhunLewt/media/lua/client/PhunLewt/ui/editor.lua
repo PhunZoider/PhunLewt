@@ -60,7 +60,7 @@ function UI:refreshAll(zone)
     self:setZoneSelection(selectedIndex or 1)
 end
 
-function UI.open(player, data, cb)
+function UI.open(player, zone)
 
     local playerIndex = player:getPlayerNum()
     local core = getCore()
@@ -71,6 +71,7 @@ function UI.open(player, data, cb)
     local y = (core:getScreenHeight() - height) / 2
 
     local instance = UI:new(x, y, width, height, player, playerIndex);
+
     instance.data = PL.table.deepCopy(data)
     instance.cb = cb
 
