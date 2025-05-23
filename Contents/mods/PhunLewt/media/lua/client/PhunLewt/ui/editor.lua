@@ -11,55 +11,6 @@ Core.ui.editor = ISCollapsableWindowJoypad:derive(profileName);
 local UI = Core.ui.editor
 local instances = {}
 
--- function UI:refreshAll(zone)
---     self.controls.zones:clear()
---     self.controls.zones:addOption("GLOBAL")
---     local zones = PZ:updateZoneData()
---     local presort = {}
---     for k, v in pairs(zones.lookup) do
---         v.k = k
---         table.insert(presort, v)
---     end
---     table.sort(presort, function(a, b)
---         if a.order and b.order then
---             return a.order < b.order
---         end
---         if a.title and b.title then
---             return a.title:lower() < b.title:lower()
---         end
---         return a.k < b.k
---     end)
---     local final = {}
---     for _, v in ipairs(presort) do
---         final[v.k] = v
---         final[v.k].k = nil
---     end
---     local selectedIndex = nil
---     local index = 1
---     self.zones = zones
---     for k, v in pairs(final) do
-
---         index = index + 1
---         if zone and zone.region == k and zone.zone == "main" then
---             selectedIndex = index
---         end
-
---         self.controls.zones:addOptionWithData(k, v.main)
-
---         for zkey, zval in pairs(v) do
---             if zkey ~= "main" then
---                 index = index + 1
---                 if zone and zone.region == k and zone.zone == zkey then
---                     selectedIndex = index
---                 end
---                 self.controls.zones:addOptionWithData(("  |- " .. zkey), zval)
---             end
---         end
-
---     end
---     self:setZoneSelection(selectedIndex or 1)
--- end
-
 function UI.open(player, data)
 
     local playerIndex = player:getPlayerNum()
@@ -79,6 +30,7 @@ function UI.open(player, data)
     instance:addToUIManager();
     instance:setVisible(true);
     instance:ensureVisible()
+    instance:refreshItems()
     return instance;
 end
 
@@ -118,7 +70,15 @@ function UI:new(x, y, width, height, player, playerIndex, data)
     o.zOffsetMediumFont = 20;
     o.zOffsetSmallFont = 6;
     o:setWantKeyEvents(true)
-    o:setTitle("editor")
+    local title = "PhunLewt Editor"
+    local zones = PZ.data.lookup
+    if zones and zones[data.region] and zones[data.region][data.zone] then
+        title = zones[data.region][data.zone].title
+        if zones[data.region][data.zone].subtitle then
+            title = title .. " - " .. zones[data.region][data.zone].subtitle
+        end
+    end
+    o:setTitle(title .. " lewt reducer")
     return o;
 end
 
@@ -147,73 +107,6 @@ function UI:close()
     end
 end
 
--- function UI:setZoneSelection(selection)
-
---     self.controls.zones.selected = selection
---     local opts = self.controls.zones.options[selection]
---     local data = opts.data
---     self:setZoneData(data)
--- end
-
--- function UI:setZoneData(data)
-
---     local regionKey = data and data.region or nil
---     local zoneKey = data and data.zone or nil
-
---     local global = self.data or {}
---     local region = regionKey and data[regionKey] or {}
---     local zone = zoneKey and region[zoneKey] or {}
-
---     if not zone.categories then
---         zone.categories = {}
---     end
---     if not zone.items then
---         zone.items = {}
---     end
-
---     self.selectedRegion = regionKey
---     self.selectedZone = zoneKey
---     self.selectedData = zone
---     self:refreshSelected(data)
-
--- end
-
--- function UI:getZoneData()
---     local global = self.data or {}
---     local region = self.regionKey and data[self.regionKey] or {}
---     local zone = self.zoneKey and region[self.zoneKey] or {}
-
---     if not zone.categories then
---         zone.categories = {}
---     end
---     if not zone.items then
---         zone.items = {}
---     end
---     return zone
--- end
-
--- function UI:refreshSelected(data)
-
---     self.controls.list:clear()
---     if not data then
---         return
---     end
---     for k, v in pairs(data) do
-
---     end
-
--- end
-
--- function UI:setData(data)
---     self.data = data
---     self:refreshItems()
-
--- end
-
--- function UI:getData()
---     return self.data
--- end
-
 function UI:createChildren()
 
     ISCollapsableWindowJoypad.createChildren(self);
@@ -238,25 +131,25 @@ function UI:createChildren()
     end
     self:addChild(self.controls.ok);
 
+    -- container for the inline filters below the list
+    local filtersPanel = ISPanel:new(0, self.controls.ok.y - 100, self.width, 80);
+    filtersPanel.drawBorder = false
+    filtersPanel:initialise();
+    filtersPanel:instantiate();
+    filtersPanel.backgroundColor = {
+        r = 0.1,
+        g = 0.1,
+        b = 0.1,
+        a = 0.8
+    }
+
+    self.controls.filtersPanel = filtersPanel
+    self:addChild(filtersPanel);
+
     y = y + padding
 
-    -- local zoneTitle = ISLabel:new(padding, y, tools.FONT_HGT_SMALL, "Zone", 1, 1, 1, 1, UIFont.Small, true);
-    -- zoneTitle:initialise();
-    -- zoneTitle:instantiate();
-    -- self:addChild(zoneTitle);
-
-    -- local zones = ISComboBox:new(self.width - 200 - padding, y, 200, tools.FONT_HGT_MEDIUM, self, function()
-    --     self:setZoneSelection(self.controls.zones.selected)
-    -- end);
-    -- zones:initialise()
-    -- self:addChild(zones)
-    -- self.controls.zones = zones
-    -- zones:setAnchorLeft(true)
-    -- zones:setAnchorRight(true)
-
-    -- y = y + padding + zones.height
-
-    local selectorTitle = ISLabel:new(padding, y, tools.FONT_HGT_SMALL, "Items", 1, 1, 1, 1, UIFont.Small, true);
+    local selectorTitle = ISLabel:new(padding, y, tools.FONT_HGT_SMALL, "Edit Item Selection", 1, 1, 1, 1, UIFont.Small,
+        true);
     selectorTitle:initialise();
     selectorTitle:instantiate();
     self:addChild(selectorTitle);
@@ -268,6 +161,7 @@ function UI:createChildren()
             local s = self
             s.data.categories = data.categories or {}
             s.data.items = data.items or {}
+            s:refreshItems()
         end)
     end);
     selector:initialise();
@@ -279,8 +173,8 @@ function UI:createChildren()
 
     y = y + padding + selector.height
 
-    local list = tools.getListbox(x + padding, y, w - (padding * 2), 220,
-        {getText("Item"), {getText("Category"), w - 150}, {getText("Chance"), w - 50}}, {
+    local list = tools.getListbox(x + padding, y, w - (padding * 2), filtersPanel.y - y - padding - tools.HEADER_HGT,
+        {getText("Item"), {getText("Category"), w - 150}, {getText("Reduction"), w - 50}}, {
             draw = self.drawDatas,
             click = self.click,
             rightClick = self.rightClick,
@@ -290,11 +184,12 @@ function UI:createChildren()
     self:addChild(list);
     self.controls.list = list
 
-    y = y + padding + list.height
-
-    local lblFilter = tools.getLabel("Filter", padding, y)
+    y = padding + filtersPanel.y
+    y = 0
+    local lblFilter = tools.getLabel("Filter", padding, padding)
     self.controls.lblFilter = lblFilter
-    self:addChild(lblFilter)
+    filtersPanel:addChild(lblFilter)
+
     local filter = ISTextEntryBox:new("", padding, y + lblFilter.height + padding, self.width - 200, tools.BUTTON_HGT);
     filter.onTextChange = function()
         self:refreshItems()
@@ -303,11 +198,11 @@ function UI:createChildren()
     filter:initialise();
     filter:instantiate();
     filter:setAnchorRight(true)
-    self:addChild(filter);
+    filtersPanel:addChild(filter);
 
     local left = filter.x + filter.width + padding
-    local lblFilterCategory = tools.getLabel("Category", self.width - x - left, y)
-    self:addChild(lblFilterCategory)
+    local lblFilterCategory = tools.getLabel("Category", self.width - x - left, lblFilter.y)
+    filtersPanel:addChild(lblFilterCategory)
     self.controls.lblFilterCategory = lblFilterCategory
     local filterCategory = ISComboBox:new(left, y + lblFilterCategory.height + padding, self.width - padding - left,
         tools.FONT_HGT_MEDIUM, self, function()
@@ -317,125 +212,12 @@ function UI:createChildren()
     filterCategory:instantiate();
 
     self.controls.filterCategory = filterCategory
-    self:addChild(filterCategory);
+    filtersPanel:addChild(filterCategory);
     filterCategory:addOption("")
     for _, category in ipairs(PL.getAllItemCategories()) do
         filterCategory:addOption(category.label)
     end
 
-end
-
-function UI:chancePromptForSelected(currentValue)
-    local modal = ISTextBox:new(0, 0, 100, 100, "Chance (0-100)", tostring(currentValue or ""), self,
-        function(target, button, obj)
-            if button.internal == "OK" then
-                local list = target.controls.list
-                local data = list.parent.selectedItems
-                local value = tonumber(button.parent.entry:getText())
-                if value ~= nil and value >= 0 and value <= 100 then
-                    for i, v in ipairs(list.items) do
-                        if data[v.item.type] == true then
-                            list.items[i].item.chance = value
-                        end
-                    end
-                end
-            end
-
-        end, self.playerIndex)
-    modal:initialise()
-    modal:addToUIManager()
-    modal:setAlwaysOnTop(true)
-end
-
-function UI:clearSelectedChance()
-    local list = self.controls.list
-    local data = list.parent.selectedItems
-
-    for i, v in ipairs(list.items) do
-        if data[v.item.type] == true then
-            list.items[i].item.chance = nil
-        end
-    end
-end
-
-function UI:click(x, y)
-    local list = self.parent.controls.list
-    self.selectedProperty = nil
-    local row = list:rowAt(x, y)
-    if row == nil or row == -1 then
-        return
-    end
-    list:ensureVisible(row)
-    local item = list.items[row].item
-
-    local data = list.parent.selectedItems
-    -- data[item.type] = data[item.type] == nil and true or nil
-
-    -- range select
-    if isShiftKeyDown() and self.lastSelected then
-        local start = math.min(row, self.lastSelected)
-        local finish = math.max(row, self.lastSelected)
-        for i = start, finish do
-            data[list.items[i].item.type] = true
-        end
-    elseif isCtrlKeyDown() then
-        if data[item.type] == nil then
-            data[item.type] = true
-        else
-            data[item.type] = nil
-        end
-    else
-        for k, v in pairs(data) do
-            if v == true then
-                data[k] = nil
-            end
-        end
-        data[item.type] = true
-    end
-    PL.debug("selectedItems", data)
-    -- remember last selected for range select
-    self.lastSelected = row
-end
-
-function UI:doubleClick(item)
-    self.parent.selectedItems = {}
-    self.parent.selectedItems[item.type] = true
-    self.parent:chancePromptForSelected(item.chance)
-
-end
-
-function UI:rightClick(x, y)
-    local list = self.parent.controls.list
-    local row = list:rowAt(x, y)
-    if row == -1 then
-        return
-    end
-    if list.selected ~= row then
-        list.selected = row
-        list.selected = row
-        list:ensureVisible(list.selected)
-    end
-    local item = list.items[list.selected].item
-    local hasSelected = false
-    for k, v in pairs(list.parent.selectedItems) do
-        if v == true then
-            hasSelected = true
-            break
-        end
-    end
-    if hasSelected then
-        local context = ISContextMenu.get(self.parent.playerIndex, self:getAbsoluteX() + x,
-            self:getAbsoluteY() + y + self:getYScroll())
-        context:removeFromUIManager()
-        context:addToUIManager()
-
-        context:addOption("Edit Chance", self, function(target)
-            target.parent:chancePromptForSelected(item.chance)
-        end, item)
-        context:addOption("Clear Chance", self, function(target)
-            target.parent:clearSelectedChance()
-        end, item)
-    end
 end
 
 function UI:isKeyConsumed(key)
@@ -453,28 +235,24 @@ function UI:prerender()
     ISCollapsableWindowJoypad.prerender(self);
 
     local padding = 10
-    local rw = self:resizeWidgetHeight()
-    local lblFilter = self.controls.lblFilter
-    local filter = self.controls.filter
-    local lblFilterCategory = self.controls.lblFilterCategory
-    local filterCategory = self.controls.filterCategory
     local ok = self.controls.ok
-
-    local y = lblFilter.parent.height - tools.BUTTON_HGT - padding - padding - padding - filter.height - padding -
-                  lblFilter.height
-    local left = filter.x + filter.width + padding
-    lblFilter:setY(y)
-    lblFilterCategory:setY(y)
-    lblFilterCategory:setX(left)
-    y = y + lblFilterCategory.height + padding
-    filter:setY(y)
-    filterCategory:setY(y)
-    filterCategory:setX(left)
-
-    y = y + filter.height + padding
-
     self.controls.ok:setX(ok.parent.width - ok.width - 10)
     self.controls.ok:setY(ok.parent.height - ok.height - self:resizeWidgetHeight() - 10)
+
+    local filterPanel = self.controls.filtersPanel
+    filterPanel:setWidth(filterPanel.parent.width)
+    filterPanel:setY(ok.y - 100)
+
+    local lblFilterCategory = self.controls.lblFilterCategory
+
+    local filterCategory = self.controls.filterCategory
+    filterCategory:setX(filterCategory.parent.width - filterCategory.width - padding)
+    filterCategory:setY(lblFilterCategory.y + lblFilterCategory.height + padding)
+    lblFilterCategory:setX(filterCategory.x)
+
+    local filter = self.controls.filter
+    filter:setWidth(filterCategory.x - filter.x - padding)
+    filter:setY(lblFilterCategory.y + lblFilterCategory.height + padding)
 
     local list = self.controls.list
     local listw = list.width - 20
@@ -483,7 +261,6 @@ function UI:prerender()
     local itemW = listw - chanceW - categoryW
     list.columns[2].size = itemW
     list.columns[3].size = itemW + categoryW
-
 end
 
 function UI:onOK()
@@ -498,7 +275,7 @@ function UI:refreshItems()
     self.lastSelected = nil
     local filterText = self.controls.filter:getInternalText():lower()
     local filterCategory = self.controls.filterCategory.options[self.controls.filterCategory.selected]
-    local filters = self.data.filters or {}
+    local filters = self.data or {}
     local results = {}
 
     local allItems = PL.getAllItems()
@@ -509,7 +286,7 @@ function UI:refreshItems()
                 label = v.label,
                 category = v.category,
                 texture = v.texture,
-                chance = v.chance
+                chance = filters.items[v.type] or filters.categories[v.category]
             })
         end
 
@@ -576,7 +353,10 @@ function UI:drawDatas(y, item, alt)
     self:drawText(value, cw + 4, y + 4, 1, 1, 1, a, self.font);
     self:clearStencilRect()
 
-    local value = tostring(item.item.chance or "")
+    local value = ""
+    if item.item.chance then
+        value = "-" .. tostring(item.item.chance) .. "%"
+    end
     local cw = self.columns[3].size
     self:setStencilRect(clipX3, clipY, self:getWidth() - clipX3 - self.vscroll.width, clipY2 - clipY)
     self:drawText(value, cw + 4, y + 4, 1, 1, 1, a, self.font);
