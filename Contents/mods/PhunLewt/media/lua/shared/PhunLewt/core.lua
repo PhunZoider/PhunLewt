@@ -5,7 +5,8 @@ PhunLewt = {
     consts = {
         itemType = {
             items = "items"
-        }
+        },
+        luaDataFileName = "PhunLewt.lua"
     },
     data = {},
     commands = {
@@ -34,7 +35,7 @@ end
 function Core:ini()
     self.inied = true
     if not isClient() then
-
+        Core:getSavedData()
     end
     triggerEvent(self.events.OnReady, self)
 end

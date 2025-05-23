@@ -2,6 +2,7 @@ if isClient() then
     return
 end
 local Core = PhunLewt
+local PL = PhunLib
 
 local function isInSafehouse(square)
 
@@ -73,5 +74,47 @@ function Core:removeItemsFromContainer(container)
 end
 
 function Core:getZoneData(region, zone)
-    return {}
+    if not region or region == "'_default" then
+        if not self.data._default then
+            self.data._default = {}
+        end
+        if not self.data._default.categories then
+            self.data._default.categories = {}
+        end
+        if not self.data._default.items then
+            self.data._default.items = {}
+        end
+        return self.data._default
+    end
+    if not self.data[region] then
+        self.data[region] = {}
+    end
+    if not self.data[region][zone] then
+        self.data[region][zone] = {
+            categories = {},
+            items = {}
+        }
+    end
+    if not self.data[region][zone].categories then
+        self.data[region][zone].categories = {}
+    end
+    if not self.data[region][zone].items then
+        self.data[region][zone].items = {}
+    end
+    return self.data[region][zone]
+
+end
+
+function Core:setZoneData(data)
+    local d = self:getZoneData(data.region, data.zone)
+    d.categories = data.categories or {}
+    d.items = data.items or {}
+    self:saveChanges(self.data)
+end
+
+function Core:saveChanges(data)
+    ModData.add(self.name, data)
+    PL.file.saveTable(self.consts.luaDataFileName, {
+        data = data
+    })
 end

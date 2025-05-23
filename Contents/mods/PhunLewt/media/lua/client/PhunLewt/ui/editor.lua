@@ -11,56 +11,56 @@ Core.ui.editor = ISCollapsableWindowJoypad:derive(profileName);
 local UI = Core.ui.editor
 local instances = {}
 
-function UI:refreshAll(zone)
-    self.controls.zones:clear()
-    self.controls.zones:addOption("GLOBAL")
-    local zones = PZ:updateZoneData()
-    local presort = {}
-    for k, v in pairs(zones.lookup) do
-        v.k = k
-        table.insert(presort, v)
-    end
-    table.sort(presort, function(a, b)
-        if a.order and b.order then
-            return a.order < b.order
-        end
-        if a.title and b.title then
-            return a.title:lower() < b.title:lower()
-        end
-        return a.k < b.k
-    end)
-    local final = {}
-    for _, v in ipairs(presort) do
-        final[v.k] = v
-        final[v.k].k = nil
-    end
-    local selectedIndex = nil
-    local index = 1
-    self.zones = zones
-    for k, v in pairs(final) do
+-- function UI:refreshAll(zone)
+--     self.controls.zones:clear()
+--     self.controls.zones:addOption("GLOBAL")
+--     local zones = PZ:updateZoneData()
+--     local presort = {}
+--     for k, v in pairs(zones.lookup) do
+--         v.k = k
+--         table.insert(presort, v)
+--     end
+--     table.sort(presort, function(a, b)
+--         if a.order and b.order then
+--             return a.order < b.order
+--         end
+--         if a.title and b.title then
+--             return a.title:lower() < b.title:lower()
+--         end
+--         return a.k < b.k
+--     end)
+--     local final = {}
+--     for _, v in ipairs(presort) do
+--         final[v.k] = v
+--         final[v.k].k = nil
+--     end
+--     local selectedIndex = nil
+--     local index = 1
+--     self.zones = zones
+--     for k, v in pairs(final) do
 
-        index = index + 1
-        if zone and zone.region == k and zone.zone == "main" then
-            selectedIndex = index
-        end
+--         index = index + 1
+--         if zone and zone.region == k and zone.zone == "main" then
+--             selectedIndex = index
+--         end
 
-        self.controls.zones:addOptionWithData(k, v.main)
+--         self.controls.zones:addOptionWithData(k, v.main)
 
-        for zkey, zval in pairs(v) do
-            if zkey ~= "main" then
-                index = index + 1
-                if zone and zone.region == k and zone.zone == zkey then
-                    selectedIndex = index
-                end
-                self.controls.zones:addOptionWithData(("  |- " .. zkey), zval)
-            end
-        end
+--         for zkey, zval in pairs(v) do
+--             if zkey ~= "main" then
+--                 index = index + 1
+--                 if zone and zone.region == k and zone.zone == zkey then
+--                     selectedIndex = index
+--                 end
+--                 self.controls.zones:addOptionWithData(("  |- " .. zkey), zval)
+--             end
+--         end
 
-    end
-    self:setZoneSelection(selectedIndex or 1)
-end
+--     end
+--     self:setZoneSelection(selectedIndex or 1)
+-- end
 
-function UI.open(player, zone)
+function UI.open(player, data)
 
     local playerIndex = player:getPlayerNum()
     local core = getCore()
@@ -70,10 +70,7 @@ function UI.open(player, zone)
     local x = (core:getScreenWidth() - width) / 2
     local y = (core:getScreenHeight() - height) / 2
 
-    local instance = UI:new(x, y, width, height, player, playerIndex);
-
-    instance.data = PL.table.deepCopy(data)
-    instance.cb = cb
+    local instance = UI:new(x, y, width, height, player, playerIndex, PL.table.deepCopy(data));
 
     instance:initialise();
 
@@ -82,11 +79,10 @@ function UI.open(player, zone)
     instance:addToUIManager();
     instance:setVisible(true);
     instance:ensureVisible()
-    instance:refreshAll()
     return instance;
 end
 
-function UI:new(x, y, width, height, player, playerIndex)
+function UI:new(x, y, width, height, player, playerIndex, data)
     local o = {};
     o = ISCollapsableWindowJoypad:new(x, y, width, height, player);
     setmetatable(o, self);
@@ -111,7 +107,7 @@ function UI:new(x, y, width, height, player, playerIndex)
         a = 1
     };
     o.controls = {}
-    o.data = {}
+    o.data = data
     o.selectedItems = {}
     o.moveWithMouse = false;
     o.anchorRight = true
@@ -151,72 +147,72 @@ function UI:close()
     end
 end
 
-function UI:setZoneSelection(selection)
+-- function UI:setZoneSelection(selection)
 
-    self.controls.zones.selected = selection
-    local opts = self.controls.zones.options[selection]
-    local data = opts.data
-    self:setZoneData(data)
-end
+--     self.controls.zones.selected = selection
+--     local opts = self.controls.zones.options[selection]
+--     local data = opts.data
+--     self:setZoneData(data)
+-- end
 
-function UI:setZoneData(data)
+-- function UI:setZoneData(data)
 
-    local regionKey = data and data.region or nil
-    local zoneKey = data and data.zone or nil
+--     local regionKey = data and data.region or nil
+--     local zoneKey = data and data.zone or nil
 
-    local global = self.data or {}
-    local region = regionKey and data[regionKey] or {}
-    local zone = zoneKey and region[zoneKey] or {}
+--     local global = self.data or {}
+--     local region = regionKey and data[regionKey] or {}
+--     local zone = zoneKey and region[zoneKey] or {}
 
-    if not zone.categories then
-        zone.categories = {}
-    end
-    if not zone.items then
-        zone.items = {}
-    end
+--     if not zone.categories then
+--         zone.categories = {}
+--     end
+--     if not zone.items then
+--         zone.items = {}
+--     end
 
-    self.selectedRegion = regionKey
-    self.selectedZone = zoneKey
-    self.selectedData = zone
-    self:refreshSelected(data)
+--     self.selectedRegion = regionKey
+--     self.selectedZone = zoneKey
+--     self.selectedData = zone
+--     self:refreshSelected(data)
 
-end
+-- end
 
-function UI:getZoneData()
-    local global = self.data or {}
-    local region = self.regionKey and data[self.regionKey] or {}
-    local zone = self.zoneKey and region[self.zoneKey] or {}
+-- function UI:getZoneData()
+--     local global = self.data or {}
+--     local region = self.regionKey and data[self.regionKey] or {}
+--     local zone = self.zoneKey and region[self.zoneKey] or {}
 
-    if not zone.categories then
-        zone.categories = {}
-    end
-    if not zone.items then
-        zone.items = {}
-    end
-    return zone
-end
+--     if not zone.categories then
+--         zone.categories = {}
+--     end
+--     if not zone.items then
+--         zone.items = {}
+--     end
+--     return zone
+-- end
 
-function UI:refreshSelected(data)
+-- function UI:refreshSelected(data)
 
-    self.controls.list:clear()
-    if not data then
-        return
-    end
-    for k, v in pairs(data) do
+--     self.controls.list:clear()
+--     if not data then
+--         return
+--     end
+--     for k, v in pairs(data) do
 
-    end
+--     end
 
-end
+-- end
 
-function UI:setData(data)
-    self.data = data
-    self:refreshItems()
+-- function UI:setData(data)
+--     self.data = data
+--     self:refreshItems()
 
-end
+-- end
 
-function UI:getData()
-    return self.data
-end
+-- function UI:getData()
+--     return self.data
+-- end
 
 function UI:createChildren()
 
@@ -244,21 +240,21 @@ function UI:createChildren()
 
     y = y + padding
 
-    local zoneTitle = ISLabel:new(padding, y, tools.FONT_HGT_SMALL, "Zone", 1, 1, 1, 1, UIFont.Small, true);
-    zoneTitle:initialise();
-    zoneTitle:instantiate();
-    self:addChild(zoneTitle);
+    -- local zoneTitle = ISLabel:new(padding, y, tools.FONT_HGT_SMALL, "Zone", 1, 1, 1, 1, UIFont.Small, true);
+    -- zoneTitle:initialise();
+    -- zoneTitle:instantiate();
+    -- self:addChild(zoneTitle);
 
-    local zones = ISComboBox:new(self.width - 200 - padding, y, 200, tools.FONT_HGT_MEDIUM, self, function()
-        self:setZoneSelection(self.controls.zones.selected)
-    end);
-    zones:initialise()
-    self:addChild(zones)
-    self.controls.zones = zones
-    zones:setAnchorLeft(true)
-    zones:setAnchorRight(true)
+    -- local zones = ISComboBox:new(self.width - 200 - padding, y, 200, tools.FONT_HGT_MEDIUM, self, function()
+    --     self:setZoneSelection(self.controls.zones.selected)
+    -- end);
+    -- zones:initialise()
+    -- self:addChild(zones)
+    -- self.controls.zones = zones
+    -- zones:setAnchorLeft(true)
+    -- zones:setAnchorRight(true)
 
-    y = y + padding + zones.height
+    -- y = y + padding + zones.height
 
     local selectorTitle = ISLabel:new(padding, y, tools.FONT_HGT_SMALL, "Items", 1, 1, 1, 1, UIFont.Small, true);
     selectorTitle:initialise();
@@ -266,33 +262,12 @@ function UI:createChildren()
     self:addChild(selectorTitle);
 
     local selector = ISButton:new(self.width - 200 - padding, y, 200, tools.BUTTON_HGT, " ... ", self, function()
-        -- get currently selected zone
-        local regionKey = self.selectedRegion
-        local zoneKey = self.selectedZone
-
-        local data = nil
-        if regionKey then
-            data = self.data[regionKey] or {}
-        end
-        if zoneKey then
-            data = self.data[regionKey] and self.data[regionKey][zoneKey] or {}
-        end
-        if not data then
-            data = self.data["GLOBAL"] or {}
-        end
-        local existing = PL.table.deepCopy(data)
+        local existing = PL.table.deepCopy(self.data)
 
         Core.ui.filters.open(self.player, existing, function(data)
             local s = self
-            if regionKey and zoneKey then
-                s.data[regionKey] = s.data[regionKey] or {}
-                s.data[regionKey][zoneKey] = data
-            elseif regionKey then
-                s.data[regionKey] = data
-            else
-                s.data["GLOBAL"] = data
-            end
-            s:setData(s:getData())
+            s.data.categories = data.categories or {}
+            s.data.items = data.items or {}
         end)
     end);
     selector:initialise();
@@ -348,7 +323,6 @@ function UI:createChildren()
         filterCategory:addOption(category.label)
     end
 
-    self:refreshAll()
 end
 
 function UI:chancePromptForSelected(currentValue)
@@ -513,14 +487,15 @@ function UI:prerender()
 end
 
 function UI:onOK()
-    self.cb(self:getData())
+
+    local data = self.data
+    sendClientCommand(Core.name, Core.commands.saveZoneData, data)
     self:close()
 end
 
 function UI:refreshItems()
     self.controls.list:clear();
     self.lastSelected = nil
-    self.data = self:getData()
     local filterText = self.controls.filter:getInternalText():lower()
     local filterCategory = self.controls.filterCategory.options[self.controls.filterCategory.selected]
     local filters = self.data.filters or {}
