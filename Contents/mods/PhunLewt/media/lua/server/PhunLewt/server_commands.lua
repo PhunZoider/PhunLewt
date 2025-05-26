@@ -3,27 +3,21 @@ if isClient() then
 end
 
 local Core = PhunLewt
+local PL = PhunLib
 local Commands = {}
 
 Commands[Core.commands.requestZoneData] = function(player, args)
-
+    PhunLib.debug("PhunLewt:requestZoneData", args)
     local data = Core:getZoneData(args.region, args.zone)
     if data then
+        local copy = PL.table.deepCopy(data)
+
         if Core.isLocal then
-            Core.editZoneData(player, {
-                region = args.region,
-                zone = args.zone,
-                categories = data.categories,
-                items = data.items
-            })
+            Core.editZoneData(player, copy)
+            Core.hideLoadingModal()
         else
-            local payload = {
-                username = player:getUsername(),
-                region = args.region,
-                categories = data.categories,
-                items = data.items
-            }
-            sendServerCommand(player, Core.name, Core.commands.requestZoneData, payload)
+            copy.username = player:getUsername()
+            sendServerCommand(player, Core.name, Core.commands.requestZoneData, copy)
         end
     end
 

@@ -1,6 +1,6 @@
 version=1
 id=
-title=PhunLewt
-description=
+title=PhunLewt Reducer
+description=Reduce loot levels per zone
 tags=
 visibility=unlisted

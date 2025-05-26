@@ -120,7 +120,7 @@ function UI:createChildren()
     self.controls = {}
 
     self.controls.ok = ISButton:new(padding, self.height - rh - padding - tools.FONT_HGT_SMALL, 100,
-        tools.FONT_HGT_SMALL + 4, "OK", self, UI.onOK);
+        tools.FONT_HGT_SMALL + 4, getText("IGUI_PhunLewt_Ok"), self, UI.onOK);
     self.controls.ok:initialise();
     self.controls.ok:instantiate();
     if self.controls.ok.enableAcceptColor then
@@ -145,8 +145,8 @@ function UI:createChildren()
         type = Core.consts.itemType.items
     });
 
-    self.controls.tabPanel:addView("Items", self.controls.items)
-    self.controls.tabPanel:addView("Categories", self.controls.categories)
+    self.controls.tabPanel:addView(getText("IGUI_PhunLewt_Items"), self.controls.items)
+    self.controls.tabPanel:addView(getText("IGUI_PhunLewt_Categories"), self.controls.categories)
 
     self:refreshAll()
 end

@@ -148,8 +148,28 @@ function UI:createChildren()
 
     y = y + padding
 
-    local selectorTitle = ISLabel:new(padding, y, tools.FONT_HGT_SMALL, "Edit Item Selection", 1, 1, 1, 1, UIFont.Small,
-        true);
+    local lbl = tools.getLabel(getText("IGUI_PhunLewt_Hours_To_Full"), padding, y)
+    local txt = tools.getTextbox(tostring(self.data.hours or ""), getText("IGUI_PhunLewt_Hours_To_Full_tooltip"),
+        self.width - 200 - padding, y, 200);
+    self.controls.lblHours = lbl
+    self.controls.hours = txt
+    self:addChild(lbl);
+    self:addChild(txt)
+
+    y = y + lbl.height + padding
+
+    lbl = tools.getLabel(getText("IGUI_PhunLewt_On_Empty_Add_Item"), padding, y)
+    txt = tools.getTextbox(tostring(self.data.onempty or ""), getText("IGUI_PhunLewt_On_Empty_Add_Item_tooltip"),
+        self.width - 200 - padding, y, 200);
+    self.controls.lblOnEmtpy = lbl
+    self.controls.onempty = txt
+    self:addChild(lbl);
+    self:addChild(txt)
+
+    y = y + lbl.height + padding
+
+    local selectorTitle = ISLabel:new(padding, y, tools.FONT_HGT_SMALL, getText("IGUI_PhunLewt_Edit_Item_Selection"), 1,
+        1, 1, 1, UIFont.Small, true);
     selectorTitle:initialise();
     selectorTitle:instantiate();
     self:addChild(selectorTitle);
@@ -173,8 +193,26 @@ function UI:createChildren()
 
     y = y + padding + selector.height
 
+    if self.data.region ~= "_default" then
+        local chkExtend = ISTickBox:new(self.width - 200 - padding, y, tools.BUTTON_HGT, tools.BUTTON_HGT,
+            getText("IGUI_PhunZones_AllZones"), self)
+        chkExtend:addOption(getText("IGUI_PhunLewt_Extend_Default"), nil)
+        chkExtend:setWidthToFit()
+        chkExtend:setSelected(1, self.data.extended ~= false)
+        chkExtend.onMouseUp = function(s, x, y)
+            ISTickBox.onMouseUp(s, x, y)
+            return true
+        end
+        chkExtend.tooltip = getText("IGUI_PhunLewt_Extend_Default_tooltip")
+        self:addChild(chkExtend)
+        self.controls.extend = chkExtend
+
+        y = y + chkExtend.height + padding
+    end
+
     local list = tools.getListbox(x + padding, y, w - (padding * 2), filtersPanel.y - y - padding - tools.HEADER_HGT,
-        {getText("Item"), {getText("Category"), w - 150}, {getText("Reduction"), w - 50}}, {
+        {getText("Item"), {getText("IGUI_PhunLewt_Category_Header"), w - 150},
+         {getText("IGUI_PhunLewt_Reduction_Percent"), w - 50}}, {
             draw = self.drawDatas,
             click = self.click,
             rightClick = self.rightClick,
@@ -186,7 +224,7 @@ function UI:createChildren()
 
     y = padding + filtersPanel.y
     y = 0
-    local lblFilter = tools.getLabel("Filter", padding, padding)
+    local lblFilter = tools.getLabel(getText("IGUI_PhunLewt_Filter"), padding, padding)
     self.controls.lblFilter = lblFilter
     filtersPanel:addChild(lblFilter)
 
@@ -201,7 +239,8 @@ function UI:createChildren()
     filtersPanel:addChild(filter);
 
     local left = filter.x + filter.width + padding
-    local lblFilterCategory = tools.getLabel("Category", self.width - x - left, lblFilter.y)
+    local lblFilterCategory = tools.getLabel(getText("IGUI_PhunLewt_Category_Header"), self.width - x - left,
+        lblFilter.y)
     filtersPanel:addChild(lblFilterCategory)
     self.controls.lblFilterCategory = lblFilterCategory
     local filterCategory = ISComboBox:new(left, y + lblFilterCategory.height + padding, self.width - padding - left,
@@ -266,6 +305,13 @@ end
 function UI:onOK()
 
     local data = self.data
+    if self.controls.extend and self.controls.extend:isSelected(1) == false then
+        data.extend = false
+    else
+        data.extend = nil
+    end
+    data.hours = tonumber(self.controls.hours:getText()) or nil
+    data.onempty = self.controls.onempty:getText() or nil
     sendClientCommand(Core.name, Core.commands.saveZoneData, data)
     self:close()
 end
@@ -273,6 +319,7 @@ end
 function UI:refreshItems()
     self.controls.list:clear();
     self.lastSelected = nil
+
     local filterText = self.controls.filter:getInternalText():lower()
     local filterCategory = self.controls.filterCategory.options[self.controls.filterCategory.selected]
     local filters = self.data or {}

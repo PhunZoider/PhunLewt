@@ -112,7 +112,7 @@ function UI:rightClick(x, y)
 end
 
 function UI:chancePromptForSelected(currentValue)
-    local modal = ISTextBox:new(0, 0, 100, 100, "Chance (0-100)", tostring(currentValue or ""), self,
+    local modal = ISTextBox:new(0, 0, 280, 180, "Chance (0-100)", tostring(currentValue or ""), self,
         function(target, button, obj)
             if button.internal == "OK" then
                 local list = target.controls.list

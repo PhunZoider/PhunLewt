@@ -9,12 +9,6 @@ Events.OnFillContainer.Add(function(roomtype, containertype, container)
     Core:removeItemsFromContainer(container)
 end);
 
-Events.OnGameBoot.Add(function()
-    Core:tweakItems()
-end)
-Events.OnServerStarted.Add(function()
-    Core:refreshItemsToReduce()
-end)
 Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
     if module == Core.name then
         if Commands[command] then

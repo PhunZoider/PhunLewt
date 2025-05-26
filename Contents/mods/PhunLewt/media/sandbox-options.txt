@@ -1,11 +1,9 @@
 VERSION = 1,
 
-option PhunLewt.MaxGameHoursForEmptyContainer
+option PhunLewt.Debug
 { 
-    type = integer, 
-    default = 72, 
-    min = 0,
-    max = 99999,
-    page = PhunStuff, 
-    translation = PhunLewt_MaxGameHoursForEmptyContainer,
+    type = boolean,
+    default = false,
+    page = PhunLewt,
+    translation = PhunLewt_Debug,
 }

@@ -39,19 +39,20 @@ function UI:createChildren()
     self:addChild(filtersPanel);
 
     -- list of items
-    local list = tools.getListbox(x + padding, y + padding, self:getWidth() - (padding * 2), filtersPanel.y, {getText(
-        "Item"), {getText("Category"), self.width - 200}, {getText("Chance"), self.width - 100}}, {
-        draw = self.drawDatas,
-        click = self.click,
-        rightClick = self.rightClick,
-        doubleClick = self.doubleClick
-    })
+    local list = tools.getListbox(x + padding, y + padding, self:getWidth() - (padding * 2), filtersPanel.y,
+        {getText("Item"), {getText("IGUI_PhunLewt_Category_Header"), self.width - 200},
+         {getText("IGUI_PhunLewt_Reduction_Percent"), self.width - 100}}, {
+            draw = self.drawDatas,
+            click = self.click,
+            rightClick = self.rightClick,
+            doubleClick = self.doubleClick
+        })
 
     self.controls.list = list
     self:addChild(list)
 
     -- filter label
-    local lblFilter = tools.getLabel("Filter", padding, padding)
+    local lblFilter = tools.getLabel(getText("IGUI_PhunLewt_Filter"), padding, padding)
     filtersPanel:addChild(lblFilter)
 
     -- filter text input
@@ -67,7 +68,8 @@ function UI:createChildren()
     local left = filter.x + filter.width + padding
 
     -- filter category label
-    local lblFilterCategory = tools.getLabel("Category", filtersPanel.width - x - left, padding)
+    local lblFilterCategory = tools.getLabel(getText("IGUI_PhunLewt_Category_Header"), filtersPanel.width - x - left,
+        padding)
     filtersPanel:addChild(lblFilterCategory)
     self.controls.lblFilterCategory = lblFilterCategory
     local filterCategory = ISComboBox:new(left, y, filtersPanel.width - x - left, tools.FONT_HGT_MEDIUM, self,
@@ -84,7 +86,7 @@ function UI:createChildren()
         function()
         end)
     showAll:initialise();
-    showAll:addOption("Show all");
+    showAll:addOption(getText("IGUI_PhunLewt_ShowAll"));
     showAll.changeOptionMethod = function()
         self:refreshData()
     end

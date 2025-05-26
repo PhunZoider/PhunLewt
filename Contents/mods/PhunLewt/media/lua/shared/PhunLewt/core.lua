@@ -11,7 +11,6 @@ PhunLewt = {
     data = {},
     commands = {
         playerSetup = "playerSetup",
-        refillContainer = "refillContainer",
         requestZoneData = "requestZoneData",
         saveZoneData = "saveZoneData"
     },
@@ -35,7 +34,18 @@ end
 function Core:ini()
     self.inied = true
     if not isClient() then
-        Core:getSavedData()
+        Core.data = ModData.getOrCreate(self.name)
+        -- Core:getSavedData()
     end
     triggerEvent(self.events.OnReady, self)
+end
+
+function Core:getReductionValue(region, zone, item)
+    if self.data[region] and self.data[region][zone] and self.data[region][zone][item] then
+        return self.data[region][zone][item]
+    end
+    if self.data._default and self.data._default[item] then
+        return self.data._default[item]
+    end
+    return 0
 end

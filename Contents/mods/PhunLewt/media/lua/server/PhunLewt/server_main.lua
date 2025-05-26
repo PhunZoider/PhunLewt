@@ -3,78 +3,100 @@ if isClient() then
 end
 local Core = PhunLewt
 local PL = PhunLib
+local PZ = PhunZones
 
-local function isInSafehouse(square)
-
-    local safehouses = SafeHouse:getSafehouseList()
-    for index = 1, safehouses:size(), 1 do
-        local safehouse = safehouses:get(index - 1)
-        if square:getX() > safehouse:getX() and square:getX() < safehouse:getX2() then
-            if square:getY() > safehouse:getY() and square:getY() < safehouse:getY2() then
-                return true
-            end
-        end
-    end
-end
-
-function Core:refillContainer(player, args)
-    local square = getSquare(args.x, args.y, args.z)
-    if square then
-        if isInSafehouse(square) then
-            return
-        end
-        local objs = square:getObjects()
-        for i = 0, objs:size() - 1 do
-            local obj = objs:get(i)
-            local data = obj:getModData()
-            if data and data.emptied ~= nil then
-                data.emptied = 0
-                local hasContainers = obj.getContainerCount and obj:getContainerCount() > 0
-                local hasItemContainer = obj.getItemContainer and obj:getItemContainer()
-                if hasContainers then
-                    for i = 0, obj:getContainerCount() - 1 do
-                        local container = obj:getContainerByIndex(i)
-                        if container then
-                            ItemPickerJava.fillContainer(container, player)
-                        end
-                        if isServer() then
-                            obj:transmitUpdatedSpriteToClients()
-                        end
-                    end
-                elseif hasItemContainer then
-                    ItemPickerJava.fillContainer(hasItemContainer, player)
-                    if isServer() then
-                        hasItemContainer:transmitUpdatedSpriteToClients()
-                    end
-
-                end
-
-            end
-        end
-    end
-end
-
-local itemsToReduceFrequencyOf = {}
 function Core:removeItemsFromContainer(container)
-    local items = container and container.getItems and container:getItems()
-    if items and items:size() > 0 then
-        for i = items:size() - 1, 0, -1 do
-            local item = items:get(i)
-            if item then
-                local chance = itemsToReduceFrequencyOf[item:getFullType()] or 0
-                if chance > 0 then
-                    local rand = ZombRand(100)
-                    if rand < chance then
-                        container:Remove(item)
+
+    local square = container:getSourceGrid()
+    local defItem = nil
+    local adjustment = 1
+
+    if square then
+        local items = container and container.getItems and container:getItems()
+        local removed = 0
+
+        if items and items:size() > 0 then
+
+            local def = self.data._default or {
+                items = {},
+                categories = {}
+            }
+
+            local z = PZ:getLocation(square)
+
+            local zone = z.region == "_default" and {
+                items = {},
+                categories = {}
+            } or self.data[z.region] and self.data[z.region][z.zone] or {
+                items = {},
+                categories = {}
+            }
+
+            if zone.onempty ~= nil and zone.onempty ~= "" then
+                defItem = zone.onempty
+            elseif zone.exclude ~= false and def.onempty ~= nil and def.onempty ~= "" then
+                defItem = def.onempty
+            end
+
+            local hours = nil
+
+            if zone.hours and zone.hours > 0 then
+                hours = zone.hours
+            elseif def.hours and def.hours > 0 and zone.exclude ~= false then
+                hours = def.hours
+            end
+
+            if hours ~= nil then
+                if getGameTime():getWorldAgeHours() < hours then
+                    adjustment = getGameTime():getWorldAgeHours() / hours
+                end
+            end
+
+            for i = items:size() - 1, 0, -1 do
+                local item = items:get(i)
+                if item and item.getFullType and item.getDisplayCategory then
+                    local chance = nil
+                    chance = zone.items[item:getFullType()] or zone.categories[item:getDisplayCategory()] or nil
+                    if chance == nil and def.extended ~= false then
+                        chance = def.items[item:getFullType()] or def.categories[item:getDisplayCategory()] or nil
+                    end
+                    if chance ~= nil then
+                        local rand = ZombRand(100)
+                        if Core.settings.Debug then
+                            print("PhunLewt: Chance to remove item " .. item:getFullType() .. " (" ..
+                                      item:getDisplayCategory() .. "): " .. " chance: " .. tostring(chance) ..
+                                      ", adjusted: " .. tostring(adjustment) .. " (" .. tostring(hours) .. ")/(" ..
+                                      tostring(getGameTime():getWorldAgeHours()) .. ") = " ..
+                                      tostring(chance * adjustment) .. "%, rolled: " .. tostring(rand))
+                        end
+
+                        if rand < (chance * adjustment) then
+                            if Core.settings.Debug then
+                                print("PhunLewt: removing item " .. item:getFullType())
+                            end
+                            container:Remove(item)
+                            removed = removed + 1
+                        end
                     end
                 end
             end
+        end
+
+        if removed > 0 and container:isEmpty() then
+            if defItem then
+                container:AddItem(defItem)
+                if Core.settings.Debug then
+                    print("PhunLewt: added default item " .. defItem .. " to container after removing all items")
+                end
+            end
+            container:setExplored(true)
+            container:setHasBeenLooted(true)
         end
     end
 end
 
 function Core:getZoneData(region, zone)
-    if not region or region == "'_default" then
+    if not region or region == "_default" then
         if not self.data._default then
             self.data._default = {}
         end
@@ -107,13 +129,30 @@ end
 
 function Core:setZoneData(data)
     local d = self:getZoneData(data.region, data.zone)
+    if data.exclude == false then
+        d.exclude = false
+    else
+        d.exclude = nil
+    end
+    if data.onempty ~= "" then
+        d.onempty = data.onempty
+    else
+        d.onempty = nil
+    end
+    if data.hours and tonumber(data.hours) > 0 then
+        d.hours = tonumber(data.hours)
+    else
+        d.hours = nil
+    end
     d.categories = data.categories or {}
     d.items = data.items or {}
     self:saveChanges(self.data)
 end
 
 function Core:saveChanges(data)
+    self.data = data
     ModData.add(self.name, data)
+    PhunLib.debug("PhunLewt: saving data to ModData", data)
     PL.file.saveTable(self.consts.luaDataFileName, {
         data = data
     })
