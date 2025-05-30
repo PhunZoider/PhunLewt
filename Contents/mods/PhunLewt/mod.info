@@ -4,4 +4,4 @@ author=UburGeek
 description=Zone based lewt reducer
 poster=poster.png
 icon=icon.png
-requires=phunzones;phunlib
+require=phunzones,phunlib
