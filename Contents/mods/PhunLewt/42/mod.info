@@ -4,3 +4,4 @@ author=UburGeek
 description=Zone based lewt reducers and respawner
 poster=poster.png
 icon=icon.png
+require=\phunzones,\phunlib

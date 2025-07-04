@@ -12,7 +12,7 @@ IGUI_EN = {
     IGUI_PhunLewt_Extend_Default_tooltip = "If you don't want to fallback to a default value, untick this box."
 
     IGUI_PhunLewt_Hours_To_Full = "Hours Till Full"
-    IGUI_PhunLewt_Hours_To_Full_tooltip = "Number of game hours until full reduction applies. eg if the reduction value is set to 50% and this value is 240 (10 game days), then on day 5 (120 hours) the reduction is equivilent to 25%. Leave blank or 0 to ignore."
+    IGUI_PhunLewt_Hours_To_Full_tooltip = "Number of game hours until full reduction applies. eg if the reduction value is set to 50% and this value is 240 (10 game days), then for the first hour, there is no reduction. By the time we are on day 5 (120 hours which is half way to your 240 value) the reduction is an effective 25%. Leave blank or 0 to ignore."
     IGUI_PhunLewt_Category_Header = "Category"
     IGUI_PhunLewt_Reduction_Percent = "%"
 
@@ -21,5 +21,7 @@ IGUI_EN = {
     IGUI_PhunLewt_Ok = "OK"
     IGUI_PhunLewt_Categories = "Categories"
     IGUI_PhunLewt_ShowAll = "Show All"
+
+    IGUI_ItemCat_Other = "Other"
 
 }

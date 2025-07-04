@@ -1,0 +1,16 @@
+module PhunLewt
+{
+    imports
+    {
+        Base,
+    }
+
+    item Dust
+    {
+        Weight = 0.01,
+        Type = Normal,
+	    DisplayName = Dust,
+	    Icon = Dust,
+        DisplayCategory = Other, 
+    }    
+}

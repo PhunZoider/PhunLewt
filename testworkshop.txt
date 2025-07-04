@@ -1,7 +1,8 @@
 version=1
-id=3516092704
-title=PhunLewt Reducer
-description=This is a B41/B42 mod designed to allow admins to reduce the probability of loot spawning (and respawning) in containers depending on admin defined areas.
+id=3502907723
+title=PhunLewt Reducer (Test)
+visibility=unlisted
+description=This is a B41/B42 mod designed to allow admins to reduce the probability of loot spawning (and respawning) in containers depending on admin defined areas. 
 description=
 description=To illustrate, say I want to reduce the global spawning of ammo by 50%, except I don't want any ammo spawning in Rosewood and I want normal spawning in Louisville. To do this I would:
 description=[list]
@@ -11,7 +12,7 @@ description=[*]Set the [i]ammo[/i] rate for [b]Louisville[/b] to 0 (to reduce re
 description=[/list]
 description=
 description=[H1]IMPORTANT[/H1]
-description=
+description=This mod is a testing version and requires a test version of PhunZones [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3477049576]found here[/url]. Note that versions modid differs from the current "live" version. 
 description=This mod can only reduce the item quantities in a container after the game has stocked the container. If the game doesnt stock/restock the container (depending on your settings), this code will not run for that container!
 description=
 description=This mod Requires the PhunZone and PhunLib mods
@@ -37,5 +38,8 @@ description=[*][b]Extend Defaults[/b]. Untick if you want this zone to ignore an
 description=[url=https://discord.gg/v2USyAtP6q][img]https://i.imgur.com/q2rnXYZ.png[/img][/url]
 description=[/list]
 description=Coded with love for our awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community. [url=https://github.com/PhunZoider/PhunLewt]Repo and more info[/url]
-tags=Build 41;Build 42;Items;Multiplayer
-visibility=public
+require=phunzones
+tags=Build 41;Build 42;Multiplayer
+
+
+

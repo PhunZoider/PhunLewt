@@ -159,7 +159,7 @@ function UI:createChildren()
     y = y + lbl.height + padding
 
     lbl = tools.getLabel(getText("IGUI_PhunLewt_On_Empty_Add_Item"), padding, y)
-    txt = tools.getTextbox(tostring(self.data.onempty or ""), getText("IGUI_PhunLewt_On_Empty_Add_Item_tooltip"),
+    txt = tools.getTextbox(tostring(self.data.onempty or ""), getText("IGUI_PhunLewt_On_Empty_Add_Item_Tooltip"),
         self.width - 200 - padding, y, 200);
     self.controls.lblOnEmtpy = lbl
     self.controls.onempty = txt
