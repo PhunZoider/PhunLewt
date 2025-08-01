@@ -11,9 +11,9 @@ function Core:getSavedData()
     if d == nil then
         print("PhunLewt: missing ./lua/" .. self.consts.luaDataFileName ..
                   ", this is normal if you haven't modified any zones")
+        ModData.add(self.name, {})
     elseif d.data then
-        ModData.add(self.consts.luaDataFileName, d.data or {})
-        data = ModData.get(self.consts.luaDataFileName)
+        ModData.add(self.name, d.data or {})
         print("PhunLewt: loaded customisations from ./lua/" .. self.consts.luaDataFileName)
     elseif d.data == nil then
         print("PhunLewt: Unexpected format of ./lua/" .. self.consts.luaDataFileName .. ", cannot load data")
@@ -24,4 +24,5 @@ function Core:getSavedData()
         ModData.add(self.name, data)
     end
     Core.data = data
+    return data
 end

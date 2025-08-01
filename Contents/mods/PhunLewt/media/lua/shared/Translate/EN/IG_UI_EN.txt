@@ -8,7 +8,7 @@ IGUI_EN = {
     IGUI_PhunLewt_On_Empty_Add_Item = "On Empty Add Item"
     IGUI_PhunLewt_On_Empty_Add_Item_Tooltip = "If all items end up removed, add this item. eg PhunLewt.Dust"
 
-    IGUI_PhunLewt_Extend_Default = "Extend Defaults"
+    IGUI_PhunLewt_Extend_Default = "Inherit"
     IGUI_PhunLewt_Extend_Default_tooltip = "If you don't want to fallback to a default value, untick this box."
 
     IGUI_PhunLewt_Hours_To_Full = "Hours Till Full"

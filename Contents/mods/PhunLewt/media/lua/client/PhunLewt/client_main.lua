@@ -7,7 +7,10 @@ local Core = PhunLewt
 function Core.editZoneData(player, data)
     Core.ui.editor.open(player, data, function(zone)
         local s = self
-        s:setData({})
+        s:setData({
+            region = zone.region,
+            zone = zone.zone
+        })
     end)
 end
 

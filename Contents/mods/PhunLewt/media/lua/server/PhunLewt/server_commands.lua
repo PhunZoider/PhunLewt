@@ -8,6 +8,7 @@ local Commands = {}
 
 Commands[Core.commands.requestZoneData] = function(player, args)
     PhunLib.debug("PhunLewt:requestZoneData", args)
+    -- Core:getSavedData()
     local data = Core:getZoneData(args.region, args.zone)
     if data then
         local copy = PL.table.deepCopy(data)

@@ -26,16 +26,18 @@ description=Find the item and/or category of items you wish to change. Double cl
 description=[img]https://i.imgur.com/C604Chi.png[/img]
 description=then click OK to save
 description=
-description=You will then be taken back to the lewt settings for that zone. Here you will see the complete list of items that are affected.
-description=[img]https://i.imgur.com/LkS2TED.png[/img]
-description=
 description=Other settings per zone:
 description=[list]
 description=[*][b]Hours Till Full[/b]. This is the amount of hours that need to pass until your reduction comes into full effect. For example, lets say you have Aviator Glasses set to 50 and you set this value to 240 (10 game days). For the first hour, the spawn rate will be unchanged, however by day 5, the effective reduction of the glasses will be 25%. Finally, by day 10, the full reduction will take effect (in this case, -50%).
-description=[*][b]On Empty Add Item[/b]: In instances where everything in the container gets removed after a restock, add this item. Doing this can at least give a visual cue to a player that the container in fact restocked. I had a dust item to use here, but for some reason I removed it. Will check into it
-description=[*][b]Extend Defaults[/b]. Untick if you want this zone to ignore any values in [b]Defaults[/b].
-description=[url=https://discord.gg/v2USyAtP6q][img]https://i.imgur.com/q2rnXYZ.png[/img][/url]
+description=[*][b]On Empty Add Item[/b]: In instances where everything in the container gets removed after a restock, add this item. This can at least give a visual cue to a player that the container in fact restocked. It needs to be the full name, eg PhunLewt.Dust or Base.Money
+description=[*][b]Inherit[/b]. Untick if you want this zone to ignore any parent or default values.
 description=[/list]
+description=Sandbox settings:
+description=[list]
+description=[*][b]Default Reduction[/b]. Reduce all loot spawns by this percentage unless otherwise specified in the zones settings. Requires restart if changed.
+description=[*][b]Debug[/b]: Tick this box to see verbose feedback when PhunLewt is removing stuff from containers. Requires restart.
+description=[/list]
+description=[url=https://discord.gg/v2USyAtP6q][img]https://i.imgur.com/q2rnXYZ.png[/img][/url]
 description=Coded with love for our awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community. [url=https://github.com/PhunZoider/PhunLewt]Repo and more info[/url]
 tags=Build 41;Build 42;Items;Multiplayer
 visibility=public

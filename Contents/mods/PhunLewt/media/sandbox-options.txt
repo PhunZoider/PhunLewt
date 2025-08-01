@@ -1,5 +1,16 @@
 VERSION = 1,
 
+
+option PhunLewt.Default
+{ 
+    type = integer,
+    default = 0,
+    min=0,
+    max=100,
+    page = PhunLewt,
+    translation = PhunLewt_Default,
+}
+
 option PhunLewt.Debug
 { 
     type = boolean,
