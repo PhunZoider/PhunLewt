@@ -17,3 +17,9 @@ PZ.fields.lewt = {
         })
     end
 }
+
+PZ.fields.lewtgroup = {
+    label = "IGUI_PhunLewt_LewtGroup",
+    type = "string",
+    tooltip = "IGUI_PhunLewt_LewtGroup_tooltip"
+}

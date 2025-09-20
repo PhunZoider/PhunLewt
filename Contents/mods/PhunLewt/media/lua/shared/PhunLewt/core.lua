@@ -12,7 +12,8 @@ PhunLewt = {
     commands = {
         playerSetup = "playerSetup",
         requestZoneData = "requestZoneData",
-        saveZoneData = "saveZoneData"
+        saveZoneData = "saveZoneData",
+        debug = "debug"
     },
     events = {
         onReady = "PhunLewtOnReady"

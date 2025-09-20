@@ -17,6 +17,7 @@ function Core:getSavedData()
         print("PhunLewt: loaded customisations from ./lua/" .. self.consts.luaDataFileName)
     elseif d.data == nil then
         print("PhunLewt: Unexpected format of ./lua/" .. self.consts.luaDataFileName .. ", cannot load data")
+        ModData.add(self.name, {})
     end
     data = ModData.get(self.name)
     if data == nil then

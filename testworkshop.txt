@@ -1,5 +1,4 @@
 version=1
-id=3502907723
 title=PhunLewt Reducer (Test)
 visibility=unlisted
 description=This is a B41/B42 mod designed to allow admins to reduce the probability of loot spawning (and respawning) in containers depending on admin defined areas. 

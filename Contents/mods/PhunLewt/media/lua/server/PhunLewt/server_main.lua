@@ -5,6 +5,16 @@ local Core = PhunLewt
 local PL = PhunLib
 local PZ = PhunZones
 
+local getGameTime = getGameTime
+local getSandboxOptions = getSandboxOptions
+
+function Core:getAdjustmentsForZone(region, zone)
+    if self.settings.Debug then
+        print("PhunLewt: getAdjustmentsForZone", region, zone)
+    end
+    return self.zoneLookups[region .. zone] or self.zoneLookups[region .. "main"]
+end
+
 function Core:removeItemsFromContainer(container)
     if self.zoneLookups == nil then
         self:cacheLookups()
@@ -18,6 +28,7 @@ function Core:removeItemsFromContainer(container)
     if square then
         local items = container and container.getItems and container:getItems()
         local removed = 0
+        local doDebug = self.settings.Debug or false
 
         if items and items:size() > 0 then
 
@@ -34,8 +45,23 @@ function Core:removeItemsFromContainer(container)
             end
 
             local z = PZ:getLocation(square)
+            local selfData = self.data
+            local selfLookup = self.zoneLookups
+            local lookup = self.zoneLookups[z.region .. z.zone] or self.zoneLookups[z.region .. "main"] or nil
 
-            local lookup = self.zoneLookups[z.region .. z.zone] or self.zoneLookups[z.region .. "main"] or def
+            if lookup == nil then
+                lookup = def
+            else
+                if lookup.inherits then
+                    local iregion, izone = lookup.inherits[1], lookup.inherits[2]
+                    if iregion and izone and self.data[iregion] and self.zoneLookups[iregion][izone] then
+                        def = self.data[iregion][izone]
+                        if def.onempty ~= nil and def.onempty ~= "" then
+                            defItem = def.onempty
+                        end
+                    end
+                end
+            end
 
             if lookup.onempty ~= nil and lookup.onempty ~= "" then
                 defItem = lookup.onempty
@@ -45,7 +71,7 @@ function Core:removeItemsFromContainer(container)
 
             if lookup.hours and lookup.hours > 0 then
                 hours = lookup.hours
-            elseif def.hours and def.hours > 0 and lookup.exclude ~= false then
+            elseif def.hours and def.hours > 0 and lookup.extend ~= false then
                 hours = def.hours
             end
 
@@ -55,24 +81,34 @@ function Core:removeItemsFromContainer(container)
                 end
             end
 
-            -- PhunLib.debug("PhunLewt:def", def)
+            local defaultReduction = self.settings.Default or 0
+
+            if doDebug then
+                print("PhunLewt: Zone " .. z.region .. "/" .. z.zone .. " adjustment: " .. tostring(adjustment) ..
+                          " (hours: " .. tostring(hours) .. " of " .. tostring(getGameTime():getWorldAgeHours()) .. ") " ..
+                          tostring(defaultReduction))
+                -- PL.debug("PhunLewt: Zone lookup", lookup, "--------")
+            end
 
             for i = items:size() - 1, 0, -1 do
                 local item = items:get(i)
                 if item and item.getFullType and item.getDisplayCategory then
+                    -- only check item if it has a category and type
                     local chance = (lookup.items and lookup.items[item:getFullType() or ""]) or
                                        (lookup.categories and lookup.categories[item:getDisplayCategory() or ""]) or nil
+
+                    -- if we have a value, its been specified. If not and we are not in default region, check default
                     if chance == nil and z.region ~= "_default" and lookup.extend ~= false then
                         chance =
                             def.items[item:getFullType() or ""] or def.categories[item:getDisplayCategory() or ""] or
                                 nil
                     end
                     if chance == nil then
-                        chance = (100 - self.settings.Default)
+                        chance = (100 - defaultReduction)
                     end
                     if chance ~= nil then
                         local rand = ZombRand(100)
-                        if Core.settings.Debug then
+                        if doDebug then
                             print("PhunLewt: Chance to remove item " .. (item:getFullType() or "???") .. " (" ..
                                       (item:getDisplayCategory() or "???") .. "): " .. " chance: " .. tostring(chance) ..
                                       ", adjusted: " .. tostring(adjustment) .. " (" .. tostring(hours) .. ")/(" ..
@@ -81,7 +117,7 @@ function Core:removeItemsFromContainer(container)
                         end
 
                         if rand < (chance * adjustment) then
-                            if Core.settings.Debug then
+                            if doDebug then
                                 print("PhunLewt: removing item " .. (item:getFullType() or "???"))
                             end
                             container:Remove(item)

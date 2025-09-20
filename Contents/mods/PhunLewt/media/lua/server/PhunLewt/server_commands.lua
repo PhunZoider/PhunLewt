@@ -7,12 +7,11 @@ local PL = PhunLib
 local Commands = {}
 
 Commands[Core.commands.requestZoneData] = function(player, args)
-    PhunLib.debug("PhunLewt:requestZoneData", args)
-    -- Core:getSavedData()
+    -- requesting zone from the editor, reload to support lua editing 
+    Core:getSavedData()
     local data = Core:getZoneData(args.region, args.zone)
     if data then
         local copy = PL.table.deepCopy(data)
-
         if Core.isLocal then
             Core.editZoneData(player, copy)
             Core.hideLoadingModal()
@@ -26,7 +25,14 @@ end
 
 Commands[Core.commands.saveZoneData] = function(player, args)
     if args then
+        PL.debug("PhunLewt:saveZoneData", args, "--------")
         Core:setZoneData(args)
+    end
+end
+
+Commands[Core.commands.debug] = function(player, args)
+    if args then
+        PL.debug("PhunLewt:debug", args, "--------")
     end
 end
 
