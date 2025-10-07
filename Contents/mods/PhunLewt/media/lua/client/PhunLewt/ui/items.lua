@@ -9,11 +9,14 @@ local profileName = "PhunLewtItems"
 Core.ui.items = PhunLewtBase:derive(profileName);
 local UI = Core.ui.items
 
+local allItems = nil
+
 function UI:createChildren()
     self.data = {
         selectedItems = {},
         categories = {},
         items = {},
+        inherit = {},
         data = {}
     }
     ISPanelJoypad.createChildren(self)
@@ -39,7 +42,8 @@ function UI:createChildren()
     self:addChild(filtersPanel);
 
     -- list of items
-    local list = tools.getListbox(x + padding, y + padding, self:getWidth() - (padding * 2), filtersPanel.y,
+    local list = tools.getListbox(x + padding, y + padding, self:getWidth() - (padding * 2),
+        filtersPanel.y - (tools.BUTTON_HGT * 2) - (padding * 3),
         {getText("Item"), {getText("IGUI_PhunLewt_Category_Header"), self.width - 200},
          {getText("IGUI_PhunLewt_Reduction_Percent"), self.width - 100}}, {
             draw = self.drawDatas,
@@ -48,6 +52,8 @@ function UI:createChildren()
             doubleClick = self.doubleClick
         })
 
+    list.onMouseMove = self.doOnMouseMove
+    list.onMouseMoveOutside = self.doOnMouseMoveOutside
     self.controls.list = list
     self:addChild(list)
 
@@ -102,10 +108,16 @@ function UI:createChildren()
     self.tooltip.description = "";
     self.tooltip:setOwner(self.controls.list)
 
+    self.tooltip2 = ISToolTip:new();
+    self.tooltip2:initialise();
+    self.tooltip2:setVisible(false);
+    self.tooltip2:setAlwaysOnTop(true)
+    self.tooltip2.description = "";
+    self.tooltip2:setOwner(self.controls.list)
+
     -- data
     self.data.selectedItems = {}
     self.data.categories = PL.getAllItemCategories()
-    self.data.items = PL.getAllItems()
 
     -- sort categories
     local catMap = {}
@@ -127,6 +139,11 @@ function UI:createChildren()
     for _, category in ipairs(categories) do
         filterCategory:addOption(category)
     end
+
+    if allItems == nil then
+        allItems = PL.getAllItems()
+    end
+    self.allItems = allItems
 
     self:refreshData()
 end
@@ -152,7 +169,7 @@ function UI:prerender()
     filter:setY(lblFilterCategory.y + lblFilterCategory.height + padding)
 
     local list = self.controls.list
-    list:setHeight(filterPanel.y - list.y - padding)
+    -- list:setHeight(filterPanel.y - list.y - padding)
 
     if #list.columns > 1 and list.width < list.columns[#list.columns].size then
         for i = 2, #list.columns do
@@ -160,6 +177,11 @@ function UI:prerender()
         end
     end
 
+end
+
+function UI:setValue(key, value)
+    self.data.items[key] = value
+    -- self:refreshData()
 end
 
 function UI:drawDatas(y, item, alt)
@@ -200,19 +222,31 @@ function UI:drawDatas(y, item, alt)
     self:drawText(item.text, xoffset, y + 4, 1, 1, 1, a, self.font);
     self:clearStencilRect()
 
+    local valueText = ""
+    local suffix = ""
+    local adjustment = nil
+    local inheritValue = self.parent.data.inherit[item.item.type] or nil
+    local itemValue = self.parent.data.items[item.item.type] or nil
+
+    if inheritValue then
+        if itemValue then
+            valueText = " - " .. tostring(itemValue) .. "% ( was -" .. tostring(inheritValue) .. "%)"
+        else
+            valueText = "- " .. tostring(inheritValue) .. "% *" -- its inherited
+        end
+    elseif itemValue then
+        valueText = " - " .. tostring(itemValue) .. "%"
+    end
+
     local value = item.item.category or ""
     local cw = self.columns[2].size
     self:setStencilRect(clipX2, clipY, clipX3 - clipX2, clipY2 - clipY)
     self:drawText(value, cw + 4, y + 4, 1, 1, 1, a, self.font);
     self:clearStencilRect()
 
-    value = ""
-    if self.parent.data.data[item.item.type] then
-        value = "-" .. tostring(self.parent.data.data[item.item.type]) .. "%"
-    end
     cw = self.columns[3].size
     self:setStencilRect(clipX3, clipY, self:getWidth() - clipX3 - self.vscroll.width, clipY2 - clipY)
-    self:drawText(value, cw + 4, y + 4, 1, 1, 1, a, self.font);
+    self:drawText(valueText, cw + 4, y + 4, 1, 1, 1, a, self.font);
     self:clearStencilRect()
 
     self.itemsHeight = y + self.itemheight;
@@ -222,15 +256,86 @@ end
 function UI:refreshData()
     self.controls.list:clear();
     self.lastSelected = nil
+
+    local merged = {}
+    for k, v in pairs(self.data.inherit or {}) do
+        merged[k] = v
+    end
+    for k, v in pairs(self.data.items) do
+        merged[k] = v
+    end
+
+    local categories = Core:getCategoryLookup()
+
     local showAll = self.controls.showAll.selected[1]
     local filter = self.controls.filter:getInternalText():lower()
     local category = self.controls.filterCategory:getOptionText(self.controls.filterCategory.selected)
-    for _, item in ipairs(self.data.items) do
-        if showAll or self.data.data[item.type] ~= nil then
+    for _, item in ipairs(self.allItems or {}) do
+        if showAll or self.data.inherit[item.type] ~= nil or self.data.items[item.type] ~= nil then
             if (filter == "" or string.match(item.label:lower(), filter)) and
                 (category == "" or item.category == category) then
                 self.controls.list:addItem(item.label, item);
             end
         end
+        -- if showAll or item ~= nil then
+        --     if (filter == "" or string.match(item:lower(), filter)) and (category == "" or categories[item] == category) then
+        --         self.controls.list:addItem(item, item);
+        --     end
+        -- end
     end
+end
+
+function UI:doTooltip(item, col, row)
+    local tooltip = self.tooltip
+    local tooltip2 = self.tooltip2
+
+    if col == nil then
+        if tooltip2:isVisible() then
+            tooltip2:setVisible(false)
+            tooltip2:removeFromUIManager()
+        end
+        tooltip:setItem(instanceItem(item.type))
+        if not tooltip:isVisible() then
+            tooltip:addToUIManager();
+            tooltip:setVisible(true)
+        end
+    else
+        if tooltip:isVisible() then
+            tooltip:setVisible(false)
+            tooltip:removeFromUIManager()
+        end
+
+        local desc = ""
+        local suffix = ""
+        local adjustment = nil
+        local inheritValue = item.type and self.data.inherit[item.type] or nil
+        local itemValue = item.type and self.data.items[item.type] or nil
+
+        if inheritValue then
+            if itemValue then
+                desc = "Value is being overwritten from - " .. tostring(inheritValue) .. "% to - " ..
+                           tostring(itemValue) .. "%"
+            else
+                desc = "Value of - " .. tostring(inheritValue) .. "% is being inherited"
+            end
+        elseif itemValue then
+            desc = "Value is set to - " .. tostring(itemValue) .. "%"
+        else
+            desc = "No value set, using default. Double click to set."
+        end
+
+        if desc ~= "" then
+            tooltip2:setName(item.label)
+            tooltip2.description = desc
+            if not tooltip2:isVisible() then
+                tooltip2:addToUIManager();
+                tooltip2:setVisible(true)
+            end
+            tooltip2:bringToTop()
+        else
+            tooltip2:setVisible(false)
+            tooltip2:removeFromUIManager()
+        end
+    end
+
 end

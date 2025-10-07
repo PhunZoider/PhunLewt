@@ -170,10 +170,10 @@ function UI:prerender()
 
     local items = self.controls.items
     local categories = self.controls.categories
-    items:setWidth(items.parent.width)
-    items:setHeight(items.parent.height)
-    categories:setWidth(categories.parent.width)
-    categories:setHeight(categories.parent.height)
+    -- items:setWidth(items.parent.width)
+    -- items:setHeight(items.parent.height)
+    -- categories:setWidth(categories.parent.width)
+    -- categories:setHeight(categories.parent.height)
 
 end
 

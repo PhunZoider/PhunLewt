@@ -6,6 +6,19 @@ IGUI_EN = {
     IGUI_PhunLewt_LewtGroup = "Lewt Group",
     IGUI_PhunLewt_LewtGroup_tooltip = "Name of the group",
 
+    IGUI_PhunLewt_New = "New",
+    IGUI_PhunLewt_Delete = "Delete",
+    IGUI_PhunLewt_Edit = "Edit",
+    IGUI_PhunLewt_Copy = "Copy",
+
+    IGUI_PhunLewt_Confirm_Remove = "Are you sure you want to delete %1?"
+
+    IGUI_PhunLewt_Name = "Name"
+    IGUI_PhunLewt_Name_Tooltip = "A unique name used to reference this configuration"
+
+    IGUI_PhunLewt_InheritFrom = "Inherit From"
+    IGUI_PhunLewt_InheritFrom_Tooltip = "For any unspecified values, use this confiurations values."
+
     IGUI_PhunLewt_Edit_Item_Selection = "Edit Item Selection"
     IGUI_PhunLewt_Edit_Item_Selection_Tooltip = "Click to select the categories/items"
     IGUI_PhunLewt_On_Empty_Add_Item = "On Empty Add Item"

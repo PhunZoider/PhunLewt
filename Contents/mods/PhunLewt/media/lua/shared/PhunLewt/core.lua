@@ -11,12 +11,17 @@ PhunLewt = {
     data = {},
     commands = {
         playerSetup = "playerSetup",
-        requestZoneData = "requestZoneData",
+        requestData = "requestData",
+        requestInheritance = "requestInheritance",
+        requestNames = "requestNames",
         saveZoneData = "saveZoneData",
-        debug = "debug"
+        debug = "debug",
+        delete = "delete",
+        copy = "copy"
     },
     events = {
-        onReady = "PhunLewtOnReady"
+        onReady = "PhunLewtOnReady",
+        OnReceiveInheritance = "PhunLewtOnReceiveInheritance"
     },
     settings = {},
     ui = {}
@@ -37,7 +42,7 @@ function Core:ini()
     if not isClient() then
         Core.data = ModData.getOrCreate(self.name)
         Core:getSavedData()
-        self:cacheLookups()
+        -- self:cacheLookups()
     end
     triggerEvent(self.events.OnReady, self)
 end

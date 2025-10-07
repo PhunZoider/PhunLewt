@@ -15,8 +15,8 @@ function UI.open(player, data)
 
     local playerIndex = player:getPlayerNum()
     local core = getCore()
-    local width = 400 * tools.FONT_SCALE
-    local height = 300 * tools.FONT_SCALE
+    local width = 450 * tools.FONT_SCALE
+    local height = 500 * tools.FONT_SCALE
 
     local x = (core:getScreenWidth() - width) / 2
     local y = (core:getScreenHeight() - height) / 2
@@ -31,7 +31,42 @@ function UI.open(player, data)
     instance:setVisible(true);
     instance:ensureVisible()
     instance:refreshItems()
+    instance:setAlwaysOnTop(true)
+
+    -- local function receiveInheritance(inheritData)
+    --     print("PhunLewt: Received inheritance data")
+    --     instance.inherit = inheritData or {}
+    --     instance:refreshItems()
+    -- end
+
+    -- Events[Core.events.OnReceiveInheritance].Add(instance.recieveInheritance)
+
     return instance;
+end
+
+function UI:requestInheritance(key)
+
+    local s = self
+
+    local function receiveInheritance(inheritData)
+        s.inherit = inheritData or {}
+        s:refreshItems()
+        Events[Core.events.OnReceiveInheritance].Remove(receiveInheritance)
+    end
+    Events[Core.events.OnReceiveInheritance].Add(receiveInheritance)
+
+    sendClientCommand(Core.name, Core.commands.requestInheritance, {
+        username = self.player:getUsername(),
+        key = key
+    })
+
+end
+
+function UI:recieveInheritance(inheritData)
+    print("PhunLewt: Received inheritance data")
+    PL.debug("PhunLewt:recieveInheritance", inheritData)
+    self.inherit = inheritData or {}
+    self:refreshItems()
 end
 
 function UI:new(x, y, width, height, player, playerIndex, data)
@@ -59,7 +94,8 @@ function UI:new(x, y, width, height, player, playerIndex, data)
         a = 1
     };
     o.controls = {}
-    o.data = data
+    o.data = data.data or {}
+    o.inherit = data.inherit or {}
     o.selectedItems = {}
     o.moveWithMouse = false;
     o.anchorRight = true
@@ -105,6 +141,7 @@ function UI:close()
     if not self.locked then
         ISCollapsableWindowJoypad.close(self);
     end
+
 end
 
 function UI:createChildren()
@@ -148,8 +185,18 @@ function UI:createChildren()
 
     y = y + padding
 
-    local lbl = tools.getLabel(getText("IGUI_PhunLewt_Hours_To_Full"), padding, y)
-    local txt = tools.getTextbox(tostring(self.data.hours or ""), getText("IGUI_PhunLewt_Hours_To_Full_tooltip"),
+    local lbl = tools.getLabel(getText("IGUI_PhunLewt_Name"), padding, y)
+    local txt = tools.getTextbox(tostring(self.data.name or ""), getText("IGUI_PhunLewt_Name_Tooltip"),
+        self.width - 200 - padding, y, 200);
+    self.controls.lblName = lbl
+    self.controls.name = txt
+    self:addChild(lbl);
+    self:addChild(txt)
+
+    y = y + lbl.height + padding
+
+    lbl = tools.getLabel(getText("IGUI_PhunLewt_Hours_To_Full"), padding, y)
+    txt = tools.getTextbox(tostring(self.data.hours or ""), getText("IGUI_PhunLewt_Hours_To_Full_tooltip"),
         self.width - 200 - padding, y, 200);
     self.controls.lblHours = lbl
     self.controls.hours = txt
@@ -168,47 +215,106 @@ function UI:createChildren()
 
     y = y + lbl.height + padding
 
-    local selectorTitle = ISLabel:new(padding, y, tools.FONT_HGT_SMALL, getText("IGUI_PhunLewt_Edit_Item_Selection"), 1,
-        1, 1, 1, UIFont.Small, true);
-    selectorTitle:initialise();
-    selectorTitle:instantiate();
-    self:addChild(selectorTitle);
+    -- local selectorTitle = ISLabel:new(padding, y, tools.FONT_HGT_SMALL, getText("IGUI_PhunLewt_Edit_Item_Selection"), 1,
+    --     1, 1, 1, UIFont.Small, true);
+    -- selectorTitle:initialise();
+    -- selectorTitle:instantiate();
+    -- self:addChild(selectorTitle);
 
-    local selector = ISButton:new(self.width - 200 - padding, y, 200, tools.BUTTON_HGT, " ... ", self, function()
-        local existing = PL.table.deepCopy(self.data)
+    -- local selector = ISButton:new(self.width - 200 - padding, y, 200, tools.BUTTON_HGT, " ... ", self, function()
+    --     local existing = PL.table.deepCopy(self.data)
+    --     Core.ui.filters.open(self.player, existing, function(data)
+    --         local s = self
+    --         s.data.categories = data.categories or {}
+    --         s.data.items = data.items or {}
+    --         s:refreshItems()
+    --     end)
+    -- end);
+    -- selector:initialise();
+    -- selector:instantiate();
+    -- selector:setAnchorRight(true);
+    -- selector:setAnchorLeft(true);
+    -- self:addChild(selector);
+    -- self.controls.selector = selector
 
-        Core.ui.filters.open(self.player, existing, function(data)
-            local s = self
-            s.data.categories = data.categories or {}
-            s.data.items = data.items or {}
-            s:refreshItems()
-        end)
-    end);
-    selector:initialise();
-    selector:instantiate();
-    selector:setAnchorRight(true);
-    selector:setAnchorLeft(true);
-    self:addChild(selector);
-    self.controls.selector = selector
+    -- y = y + padding + selector.height
 
-    y = y + padding + selector.height
+    local inheritsTitle = ISLabel:new(padding, y, tools.FONT_HGT_SMALL, getText("IGUI_PhunLewt_InheritFrom"), 1, 1, 1,
+        1, UIFont.Small, true);
+    inheritsTitle:initialise();
+    inheritsTitle:instantiate();
+    self:addChild(inheritsTitle);
 
-    if self.data.region ~= "_default" then
-        local chkExtend = ISTickBox:new(self.width - 200 - padding, y, tools.BUTTON_HGT, tools.BUTTON_HGT,
-            getText("IGUI_PhunZones_AllZones"), self)
-        chkExtend:addOption(getText("IGUI_PhunLewt_Extend_Default"), nil)
-        chkExtend:setWidthToFit()
-        chkExtend:setSelected(1, self.data.extend ~= false)
-        chkExtend.onMouseUp = function(s, x, y)
-            ISTickBox.onMouseUp(s, x, y)
-            return true
+    self.controls.inherits = ISComboBox:new(self.width - 200 - padding, y, 200, tools.FONT_HGT_MEDIUM, self, function()
+        local key = self.controls.inherits.selected > 0 and
+                        self.controls.inherits.options[self.controls.inherits.selected] or nil
+        if key then
+            self:requestInheritance(key)
+            -- sendClientCommand(Core.name, Core.commands.requestInheritance, {
+            --     username = self.player:getUsername(),
+            --     key = key
+            -- })
+        else
+            self.inherit = {}
+            self:refreshItems()
         end
-        chkExtend.tooltip = getText("IGUI_PhunLewt_Extend_Default_tooltip")
-        self:addChild(chkExtend)
-        self.controls.extend = chkExtend
-
-        y = y + chkExtend.height + padding
+    end);
+    self.controls.inherits:initialise()
+    self.controls.inherits:instantiate()
+    self.controls.inherits:setAnchorRight(true);
+    self:addChild(self.controls.inherits)
+    local names = Core.configNames or {}
+    self.controls.inherits:addOption("")
+    local selected = 1
+    for i = 1, #names do
+        if names[i] ~= self.data.name then
+            self.controls.inherits:addOption(names[i])
+            if self.data.inherit and names[i] == self.data.inherit then
+                selected = i + 1
+            end
+        end
     end
+
+    self.controls.inherits.selected = selected
+
+    y = y + padding + self.controls.inherits.height
+
+    self.controls.tabPanel = tools.getTabPanel(x, y, w, h - y - (padding * 2) - tools.BUTTON_HGT, {
+        player = self.player,
+        type = Core.consts.itemType.items
+    });
+
+    self:addChild(self.controls.tabPanel)
+
+    self.controls.categories = Core.ui.cats:new(0, y, w, self.controls.tabPanel.height, {
+        player = self.player,
+        type = Core.consts.itemType.items
+    });
+
+    self.controls.items = Core.ui.items:new(0, y, w, self.controls.tabPanel.height, {
+        player = self.player,
+        type = Core.consts.itemType.items
+    });
+
+    self.controls.tabPanel:addView(getText("IGUI_PhunLewt_Items"), self.controls.items)
+    self.controls.tabPanel:addView(getText("IGUI_PhunLewt_Categories"), self.controls.categories)
+
+    -- if self.data.region ~= "_default" then
+    --     local chkExtend = ISTickBox:new(self.width - 200 - padding, y, tools.BUTTON_HGT, tools.BUTTON_HGT,
+    --         getText("IGUI_PhunZones_AllZones"), self)
+    --     chkExtend:addOption(getText("IGUI_PhunLewt_Extend_Default"), nil)
+    --     chkExtend:setWidthToFit()
+    --     chkExtend:setSelected(1, self.data.extend ~= false)
+    --     chkExtend.onMouseUp = function(s, x, y)
+    --         ISTickBox.onMouseUp(s, x, y)
+    --         return true
+    --     end
+    --     chkExtend.tooltip = getText("IGUI_PhunLewt_Extend_Default_tooltip")
+    --     self:addChild(chkExtend)
+    --     self.controls.extend = chkExtend
+
+    --     y = y + chkExtend.height + padding
+    -- end
 
     -- local list = tools.getListbox(x + padding, y, w - (padding * 2), filtersPanel.y - y - padding - tools.HEADER_HGT,
     --     {getText("Item"), {getText("IGUI_PhunLewt_Category_Header"), w - 150},
@@ -278,6 +384,13 @@ function UI:prerender()
     self.controls.ok:setX(ok.parent.width - ok.width - 10)
     self.controls.ok:setY(ok.parent.height - ok.height - self:resizeWidgetHeight() - 10)
 
+    local items = self.controls.items
+    local categories = self.controls.categories
+    items:setWidth(items.parent.width)
+    items:setHeight(items.parent.height - self.controls.tabPanel.tabHeight)
+    categories:setWidth(categories.parent.width)
+    categories:setHeight(categories.parent.height - self.controls.tabPanel.tabHeight)
+
     -- local filterPanel = self.controls.filtersPanel
     -- filterPanel:setWidth(filterPanel.parent.width)
     -- filterPanel:setY(ok.y - 100)
@@ -305,20 +418,29 @@ end
 function UI:onOK()
 
     local data = self.data
-    if self.controls.extend and self.controls.extend:isSelected(1) == false then
-        data.extend = false
-    else
-        data.extend = nil
-    end
+
+    data.inherit = self.controls.inherits.selected > 0 and
+                       self.controls.inherits.options[self.controls.inherits.selected] or nil
     data.hours = tonumber(self.controls.hours:getText()) or nil
     data.onempty = self.controls.onempty:getText() or nil
-    data.region = data.region or "_default"
-    data.zone = data.zone or "main"
+    data.name = data.name or (data.region .. "_" .. data.zone)
+    data.items = self.controls.items:getData()
+    data.categories = self.controls.categories:getData()
+
+    -- data.region = data.region or "_default"
+    -- data.zone = data.zone or "main"
     sendClientCommand(Core.name, Core.commands.saveZoneData, data)
     self:close()
 end
 
 function UI:refreshItems()
+
+    self.controls.items.data.items = self.data.items or {}
+    self.controls.items.data.inherit = (self.inherit or {}).items or {}
+    self.controls.items:refreshData()
+    self.controls.categories.data.categories = self.data.categories or {}
+    self.controls.categories.data.inherit = (self.inherit or {}).categories or {}
+    self.controls.categories:refreshData()
     -- self.controls.list:clear();
     -- self.lastSelected = nil
 

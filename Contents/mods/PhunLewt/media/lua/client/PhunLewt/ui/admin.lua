@@ -1,0 +1,38 @@
+if isServer() then
+    return
+end
+require "DebugUIs/DebugMenu/ISDebugMenu"
+local Core = PhunLewt
+
+local function showPhunLewtConfigs()
+    Core.showLoadingModal()
+    sendClientCommand(Core.name, Core.commands.requestNames, {})
+end
+
+local ISDebugMenu_setupButtons = ISDebugMenu.setupButtons;
+function ISDebugMenu:setupButtons()
+    self:addButtonInfo("PhunLewt", function()
+        showPhunLewtConfigs()
+    end, "MAIN");
+    ISDebugMenu_setupButtons(self);
+end
+
+local ISAdminPanelUI_create = ISAdminPanelUI.create;
+function ISAdminPanelUI:create()
+    ISAdminPanelUI_create(self);
+    local fontHeight = getTextManager():getFontHeight(UIFont.Small);
+    local btnWid = 150;
+    local btnHgt = math.max(25, fontHeight + 3 * 2);
+    local btnGapY = 5;
+
+    local lastButton = self.children[self.IDMax - 1];
+    lastButton = lastButton.internal == "CANCEL" and self.children[self.IDMax - 2] or lastButton;
+
+    self.showPhunLewtConfigs = ISButton:new(lastButton.x, lastButton.y + 5 + lastButton.height,
+        self.sandboxOptionsBtn.width, self.sandboxOptionsBtn.height, "PhunLewt", self, showPhunLewtConfigs);
+    self.showPhunLewtConfigs.internal = "";
+    self.showPhunLewtConfigs:initialise();
+    self.showPhunLewtConfigs:instantiate();
+    self.showPhunLewtConfigs.borderColor = self.buttonBorderColor;
+    self:addChild(self.showPhunLewtConfigs);
+end

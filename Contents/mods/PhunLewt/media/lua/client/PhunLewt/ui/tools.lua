@@ -124,6 +124,23 @@ function tools.getListbox(x, y, w, h, columns, fns)
         end
     end
 
+    function box:getColRowAt(x, y)
+        local xIndent = 0
+        local yIndent = 0
+        local texW = 32
+        local texH = texW * 2
+        local col = 0
+        for i, column in ipairs(self.columns) do
+            if x > column.size then
+                col = i
+            else
+                break
+            end
+        end
+        local row = self:rowAt(x, y)
+        return col, row
+    end
+
     -- box.prerender = function()
     --     -- ISScrollingListBox.prerender(box);
     -- end

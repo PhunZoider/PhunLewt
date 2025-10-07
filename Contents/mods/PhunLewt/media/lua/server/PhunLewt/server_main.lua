@@ -16,9 +16,9 @@ function Core:getAdjustmentsForZone(region, zone)
 end
 
 function Core:removeItemsFromContainer(container)
-    if self.zoneLookups == nil then
-        self:cacheLookups()
-    end
+
+    local categoryLookup = self:getCategoryLookup()
+
     local square = container:getSourceGrid()
     local defItem = nil
     local adjustment = 1
@@ -32,46 +32,64 @@ function Core:removeItemsFromContainer(container)
 
         if items and items:size() > 0 then
 
+            -- if self.data._default and self.data._default.main then
+            --     def = self.data._default.main or self.data._default or {
+            --         items = {},
+            --         categories = {}
+            --     }
+            -- end
+
+            local z = PZ:getLocation(square)
+            local selfData = self.data
+
+            local lewtgroup = nil
+            if z.lewtgroup and z.lewtgroup ~= "" then
+                lewtgroup = z.lewtgroup
+            elseif z.zone ~= "main" and PZ.data[z.region] and PZ.data[z.region].main and
+                PZ.data[z.region].main.lewtgroup and PZ.data[z.region].main.lewtgroup ~= "" then
+                lewtgroup = PZ.data[z.region].main.lewtgroup
+            end
+
+            local lookup = {
+                items = {},
+                categories = {}
+            }
+
+            if self.data[lewtgroup] then
+                lookup = self.data[lewtgroup]
+            end
+
             local def = {
                 items = {},
                 categories = {}
             }
 
-            if self.data._default and self.data._default.main then
-                def = self.data._default.main or self.data._default or {
-                    items = {},
-                    categories = {}
-                }
-            end
+            local defaultReduction = 100
 
-            local z = PZ:getLocation(square)
-            local selfData = self.data
-            local selfLookup = self.zoneLookups
-            local lookup = self.zoneLookups[z.region .. z.zone] or self.zoneLookups[z.region .. "main"] or nil
-
-            if lookup == nil then
-                lookup = def
-            else
-                if lookup.inherits then
-                    local iregion, izone = lookup.inherits[1], lookup.inherits[2]
-                    if iregion and izone and self.data[iregion] and self.zoneLookups[iregion][izone] then
-                        def = self.data[iregion][izone]
-                        if def.onempty ~= nil and def.onempty ~= "" then
-                            defItem = def.onempty
-                        end
-                    end
+            if lookup.extend ~= false then
+                if PZ.data["_default"] and PZ.data["_default"].main and PZ.data["_default"].main.lewtgroup and
+                    PZ.data["_default"].main.lewtgroup ~= "" then
+                    def = self.data[PZ.data["_default"].main.lewtgroup] or {
+                        items = {},
+                        categories = {}
+                    }
                 end
+                defaultReduction = self.settings.Default or 100
+            else
+                defaultReduction = 0
             end
 
             if lookup.onempty ~= nil and lookup.onempty ~= "" then
                 defItem = lookup.onempty
+            elseif def.onempty ~= nil and def.onempty ~= "" then
+                defItem = def.onempty
             end
 
             local hours = nil
 
             if lookup.hours and lookup.hours > 0 then
                 hours = lookup.hours
-            elseif def.hours and def.hours > 0 and lookup.extend ~= false then
+            elseif def.hours and def.hours > 0 then
                 hours = def.hours
             end
 
@@ -81,48 +99,51 @@ function Core:removeItemsFromContainer(container)
                 end
             end
 
-            local defaultReduction = self.settings.Default or 0
-
             if doDebug then
-                print("PhunLewt: Zone " .. z.region .. "/" .. z.zone .. " adjustment: " .. tostring(adjustment) ..
-                          " (hours: " .. tostring(hours) .. " of " .. tostring(getGameTime():getWorldAgeHours()) .. ") " ..
-                          tostring(defaultReduction))
-                -- PL.debug("PhunLewt: Zone lookup", lookup, "--------")
+                local adjustmentText = ""
+                if adjustment < 1 then
+                    adjustmentText = " adjustment: " .. PL.string.formatWholeNumber(adjustment * 100) .. "% (hours: " ..
+                                         tostring(hours) .. " of " ..
+                                         PL.string.formatWholeNumber(getGameTime():getWorldAgeHours()) .. ") "
+
+                end
+                print("PhunLewt " .. tostring(container:getType()) .. " at " .. tostring(square:getX()) .. ", " ..
+                          tostring(square:getY()) .. ", " .. tostring(square:getZ()) .. ", config: " ..
+                          tostring(lewtgroup) .. adjustmentText .. " default reduction: " .. tostring(defaultReduction))
+
             end
 
             for i = items:size() - 1, 0, -1 do
                 local item = items:get(i)
-                if item and item.getFullType and item.getDisplayCategory then
+                if item and item.getFullType then
+                    local name = item:getFullType()
+                    local category = categoryLookup[name] or ""
                     -- only check item if it has a category and type
-                    local chance = (lookup.items and lookup.items[item:getFullType() or ""]) or
-                                       (lookup.categories and lookup.categories[item:getDisplayCategory() or ""]) or nil
+                    local chance = (lookup.items and lookup.items[name]) or
+                                       (lookup.categories and lookup.categories[category]) or nil
 
                     -- if we have a value, its been specified. If not and we are not in default region, check default
-                    if chance == nil and z.region ~= "_default" and lookup.extend ~= false then
-                        chance =
-                            def.items[item:getFullType() or ""] or def.categories[item:getDisplayCategory() or ""] or
-                                nil
+                    if chance == nil then
+                        chance = def.items[name] or def.categories[category] or nil
                     end
                     if chance == nil then
-                        chance = (100 - defaultReduction)
+                        chance = defaultReduction
                     end
-                    if chance ~= nil then
+                    if chance ~= nil and chance > 0 then
                         local rand = ZombRand(100)
                         if doDebug then
-                            print("PhunLewt: Chance to remove item " .. (item:getFullType() or "???") .. " (" ..
-                                      (item:getDisplayCategory() or "???") .. "): " .. " chance: " .. tostring(chance) ..
-                                      ", adjusted: " .. tostring(adjustment) .. " (" .. tostring(hours) .. ")/(" ..
-                                      tostring(getGameTime():getWorldAgeHours()) .. ") = " ..
-                                      tostring(chance * adjustment) .. "%, rolled: " .. tostring(rand))
+                            print("   * " .. (name or "???") .. " (" .. (category or "???") .. "): " .. ": " ..
+                                      tostring(chance) .. "%, adjusted to " ..
+                                      PL.string.formatWholeNumber(chance * adjustment) .. "%, rolled: " ..
+                                      tostring(rand) .. (rand < (chance * adjustment) and " = removing" or " = keeping"))
                         end
 
                         if rand < (chance * adjustment) then
-                            if doDebug then
-                                print("PhunLewt: removing item " .. (item:getFullType() or "???"))
-                            end
                             container:Remove(item)
                             removed = removed + 1
                         end
+                    elseif doDebug then
+                        print("   * no chance. Keeping")
                     end
                 end
             end
@@ -153,7 +174,7 @@ local function deepMerge(base, override)
             result[k] = v
         end
     end
-    for k, v in pairs(override) do
+    for k, v in pairs(override or {}) do
         if type(v) == "table" then
             result[k] = result[k] or {}
             for sk, sv in pairs(v) do
@@ -241,36 +262,36 @@ end
 function Core:setZoneData(data)
 
     local fileData = Core:getSavedData()
-
-    if fileData == nil then
-        fileData = {}
-    end
-    if not fileData[data.region] then
-        fileData[data.region] = {}
-    end
-    if not fileData[data.region][data.zone] then
-        fileData[data.region][data.zone] = {
-            categories = {},
-            items = {}
-        }
-    end
-    if data.extend == false then
-        fileData[data.region][data.zone].extend = false
-    else
-        fileData[data.region][data.zone].extend = nil
-    end
-    if data.onempty ~= "" then
-        fileData[data.region][data.zone].onempty = data.onempty
-    else
-        fileData[data.region][data.zone].onempty = nil
-    end
-    if data.hours and tonumber(data.hours) > 0 then
-        fileData[data.region][data.zone].hours = tonumber(data.hours)
-    else
-        fileData[data.region][data.zone].hours = nil
-    end
-    fileData[data.region][data.zone].categories = data.categories or {}
-    fileData[data.region][data.zone].items = data.items or {}
+    fileData[data.name] = data
+    -- if fileData == nil then
+    --     fileData = {}
+    -- end
+    -- if not fileData[data.region] then
+    --     fileData[data.region] = {}
+    -- end
+    -- if not fileData[data.region][data.zone] then
+    --     fileData[data.region][data.zone] = {
+    --         categories = {},
+    --         items = {}
+    --     }
+    -- end
+    -- if data.extend == false then
+    --     fileData[data.region][data.zone].extend = false
+    -- else
+    --     fileData[data.region][data.zone].extend = nil
+    -- end
+    -- if data.onempty ~= "" then
+    --     fileData[data.region][data.zone].onempty = data.onempty
+    -- else
+    --     fileData[data.region][data.zone].onempty = nil
+    -- end
+    -- if data.hours and tonumber(data.hours) > 0 then
+    --     fileData[data.region][data.zone].hours = tonumber(data.hours)
+    -- else
+    --     fileData[data.region][data.zone].hours = nil
+    -- end
+    -- fileData[data.region][data.zone].categories = data.categories or {}
+    -- fileData[data.region][data.zone].items = data.items or {}
     self:saveChanges(fileData)
 
     -- local d = self:getZoneData(data.region, data.zone)
@@ -292,7 +313,7 @@ function Core:setZoneData(data)
     -- d.categories = data.categories or {}
     -- d.items = data.items or {}
     -- self:saveChanges(self.data)
-    self:cacheLookups()
+    -- self:cacheLookups()
 end
 
 function Core:saveChanges(data)
@@ -304,4 +325,5 @@ function Core:saveChanges(data)
     PL.file.saveTable(self.consts.luaDataFileName, {
         data = data
     })
+    Core:buildLookup()
 end

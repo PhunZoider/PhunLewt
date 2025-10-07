@@ -121,7 +121,12 @@ function UI:chancePromptForSelected(currentValue)
                 if value ~= nil and value >= 0 and value <= 100 then
                     for i, v in ipairs(list.items) do
                         if data[v.item.type] == true then
-                            list.parent.data.data[v.item.type] = value
+                            if self.setValue then
+                                self:setValue(v.item.type, value)
+                            else
+                                list.parent.data.data[v.item.type] = value
+                            end
+                            -- list.parent.data.data[v.item.type] = value
                         end
                     end
                 end
@@ -146,6 +151,9 @@ end
 
 function UI:doOnMouseMoveOutside(dx, dy)
     local tooltip = self.parent.tooltip
+    if not tooltip then
+        return
+    end
     tooltip:setVisible(false)
     tooltip:removeFromUIManager()
 end
@@ -155,23 +163,19 @@ function UI:doOnMouseMove(dx, dy)
     local item = nil
     local tooltip = nil
 
-    if not self.dragging and self.rowAt then
+    if not self.dragging and self.getColRowAt then
         if self:isMouseOver() then
-            local row = self:rowAt(self:getMouseX(), self:getMouseY())
+            local col, row = self:getColRowAt(self:getMouseX(), self:getMouseY())
             if row ~= nil and row > 0 and self.items[row] then
                 item = self.items[row].item
                 if item then
                     tooltip = self.parent.tooltip
-
-                    tooltip:setItem(instanceItem(item.type))
-
-                    if not tooltip:isVisible() then
-
-                        tooltip:addToUIManager();
-                        tooltip:setVisible(true)
+                    if not tooltip then
+                        return
                     end
-                    tooltip:bringToTop()
-                elseif self.parent.tooltip:isVisible() then
+                    self.parent:doTooltip(item, col, row)
+
+                elseif self.parent.tooltip and self.parent.tooltip:isVisible() then
                     self.parent.tooltip:setVisible(false)
                     self.parent.tooltip:removeFromUIManager()
                 end
@@ -181,8 +185,9 @@ function UI:doOnMouseMove(dx, dy)
 
 end
 
-function UI:doTooltip()
+function UI:doTooltip(item, col, row)
 end
 
 function UI:refreshData()
 end
+

@@ -11,7 +11,7 @@ PZ.fields.lewt = {
     disabledOnNewToolTip = "IGUI_PhunLewt_DisabledOnNew_tooltip",
     onClick = function(self, zone, player)
         Core.showLoadingModal()
-        sendClientCommand(Core.name, Core.commands.requestZoneData, {
+        sendClientCommand(Core.name, Core.commands.requestData, {
             region = zone.region,
             zone = zone.zone
         })
