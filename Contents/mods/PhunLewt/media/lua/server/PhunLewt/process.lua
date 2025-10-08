@@ -91,23 +91,6 @@ function Core:buildLookup()
 
 end
 
-function Core:getCategoryLookup(refresh)
-    if not refresh and self.itemCategoryLookup then
-        return self.itemCategoryLookup
-    end
-    local results = {}
-    local itemList = getScriptManager():getAllItems()
-    for i = 0, itemList:size() - 1 do
-        local item = itemList:get(i)
-        if not item:getObsolete() and not item:isHidden() then
-            local cat = PL.getCategory(item) or ""
-            results[item:getFullName()] = cat
-        end
-    end
-    self.itemCategoryLookup = results
-    return results
-end
-
 function Core:getSavedData()
 
     -- cache categories for all items
@@ -185,7 +168,7 @@ function Core:getSavedData()
                 newStruct.data["default"] = default
             end
 
-            for zoneName, zoneData in pairs(d.data) do
+            for zoneName, zoneData in pairs(d.data or {}) do
                 if zoneName ~= "_default" then
                     for groupName, groupData in pairs(zoneData) do
                         local newGroupName = zoneName

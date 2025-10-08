@@ -193,6 +193,16 @@ function UI:createChildren()
     self:addChild(lbl);
     self:addChild(txt)
 
+    y = y + padding + lbl.height
+
+    lbl = tools.getLabel(getText("IGUI_PhunLewt_Default"), padding, y)
+    txt = tools.getTextbox(tostring(self.data.default or ""), getText("IGUI_PhunLewt_Default_Tooltip"),
+        self.width - 200 - padding, y, 200);
+    self.controls.lblName = lbl
+    self.controls.name = txt
+    self:addChild(lbl);
+    self:addChild(txt)
+
     y = y + lbl.height + padding
 
     lbl = tools.getLabel(getText("IGUI_PhunLewt_Hours_To_Full"), padding, y)
@@ -422,10 +432,11 @@ function UI:onOK()
     data.inherit = self.controls.inherits.selected > 0 and
                        self.controls.inherits.options[self.controls.inherits.selected] or nil
     data.hours = tonumber(self.controls.hours:getText()) or nil
+    data.default = tonumber(self.controls.name:getText()) or nil
     data.onempty = self.controls.onempty:getText() or nil
     data.name = data.name or (data.region .. "_" .. data.zone)
-    data.items = self.controls.items:getData()
-    data.categories = self.controls.categories:getData()
+    data.items = self.controls.items.data.items
+    data.categories = self.controls.categories.data.categories
 
     -- data.region = data.region or "_default"
     -- data.zone = data.zone or "main"

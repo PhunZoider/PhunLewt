@@ -18,8 +18,36 @@ PZ.fields.lewt = {
     end
 }
 
-PZ.fields.lewtgroup = {
-    label = "IGUI_PhunLewt_LewtGroup",
-    type = "string",
-    tooltip = "IGUI_PhunLewt_LewtGroup_tooltip"
+PZ.fields.lewtkey = {
+    label = "IGUI_PhunLewt_LewtConfig",
+    type = "combo",
+    tooltip = "IGUI_PhunLewt_LewtConfig_tooltip",
+    initialize = function()
+        sendClientCommand(Core.name, Core.commands.requestConfigNames, {})
+    end,
+    getOptions = function()
+        local options = {" "}
+        local names = Core.configNames or {}
+        table.sort(names)
+        for i, name in ipairs(names) do
+            table.insert(options, name)
+        end
+        return options
+    end
 }
+
+PZ.fields.zedlewtkey = {
+    label = "IGUI_PhunLewt_ZedLewtConfig",
+    type = "combo",
+    tooltip = "IGUI_PhunLewt_ZedLewtConfig_tooltip",
+    getOptions = function()
+        local options = {" "}
+        local names = Core.configNames or {}
+        table.sort(names)
+        for i, name in ipairs(names) do
+            table.insert(options, name)
+        end
+        return options
+    end
+}
+

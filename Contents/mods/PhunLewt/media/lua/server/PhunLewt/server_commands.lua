@@ -42,8 +42,8 @@ Commands[Core.commands.requestData] = function(player, args)
             })
             Core.hideLoadingModal()
         else
-            copy.username = player:getUsername()
             sendServerCommand(player, Core.name, Core.commands.requestData, {
+                username = player:getUsername(),
                 data = copy,
                 inherit = inherited
             })
@@ -69,6 +69,25 @@ Commands[Core.commands.requestNames] = function(player, args)
             Core.hideLoadingModal()
         else
             sendServerCommand(player, Core.name, Core.commands.requestNames, results)
+        end
+    end
+end
+
+Commands[Core.commands.requestConfigNames] = function(player, args)
+    args = args or {}
+    Core:getSavedData()
+    if args then
+        local results = {
+            username = player:getUsername(),
+            names = {}
+        }
+        for k, v in pairs(Core.data) do
+            table.insert(results.names, k)
+        end
+        if Core.isLocal then
+            Core.configNames = results.names or {}
+        else
+            sendServerCommand(player, Core.name, Core.commands.requestConfigNames, results)
         end
     end
 end

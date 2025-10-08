@@ -33,4 +33,12 @@ Commands[Core.commands.requestNames] = function(args)
     end
 end
 
+Commands[Core.commands.requestConfigNames] = function(args)
+    local player = PL.getPlayerByUsername(args.username)
+    if player then
+        args.username = nil
+        Core.configNames = args.names or {}
+    end
+end
+
 return Commands

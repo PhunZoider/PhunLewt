@@ -14,6 +14,7 @@ PhunLewt = {
         requestData = "requestData",
         requestInheritance = "requestInheritance",
         requestNames = "requestNames",
+        requestConfigNames = "requestConfigNames",
         saveZoneData = "saveZoneData",
         debug = "debug",
         delete = "delete",
@@ -37,12 +38,36 @@ for _, event in pairs(Core.events) do
     end
 end
 
+function Core.debug(...)
+    if self.settings.debug then
+        PL.debug(self.name, ...)
+    end
+end
+
 function Core:ini()
     self.inied = true
     if not isClient() then
         Core.data = ModData.getOrCreate(self.name)
         Core:getSavedData()
+        Core:buildLookup()
         -- self:cacheLookups()
     end
     triggerEvent(self.events.OnReady, self)
+end
+
+function Core:getCategoryLookup(refresh)
+    if not refresh and self.itemCategoryLookup then
+        return self.itemCategoryLookup
+    end
+    local results = {}
+    local itemList = getScriptManager():getAllItems()
+    for i = 0, itemList:size() - 1 do
+        local item = itemList:get(i)
+        if not item:getObsolete() and not item:isHidden() then
+            local cat = PL.getCategory(item) or ""
+            results[item:getFullName()] = cat
+        end
+    end
+    self.itemCategoryLookup = results
+    return results
 end

@@ -15,20 +15,28 @@ function Core:getAdjustmentsForZone(region, zone)
     return self.zoneLookups[region .. zone] or self.zoneLookups[region .. "main"]
 end
 
-function Core:removeItemsFromContainer(container)
+function Core:removeItemsFromContainer(container, isZed)
 
     local categoryLookup = self:getCategoryLookup()
 
     local square = container:getSourceGrid()
     local defItem = nil
     local adjustment = 1
-
+    local parent = container:getParent()
     local checks = {}
 
-    if square then
+    if not square and parent and parent.getSquare then
+        square = parent:getSquare()
+    end
+
+    -- self.debug("PhunLewt: removeItemsFromContainer", tostring(square), self.resolvedData)
+    if square and self.resolvedData then
         local items = container and container.getItems and container:getItems()
         local removed = 0
         local doDebug = self.settings.Debug or false
+
+        -- self.debug("PhunLewt: removeItemsFromContainer", "items in container:", items and items:size() or 0, "container",
+        --     tostring(container:getItemContainer()))
 
         if items and items:size() > 0 then
 
@@ -42,12 +50,37 @@ function Core:removeItemsFromContainer(container)
             local z = PZ:getLocation(square)
             local selfData = self.data
 
-            local lewtgroup = nil
-            if z.lewtgroup and z.lewtgroup ~= "" then
-                lewtgroup = z.lewtgroup
-            elseif z.zone ~= "main" and PZ.data[z.region] and PZ.data[z.region].main and
-                PZ.data[z.region].main.lewtgroup and PZ.data[z.region].main.lewtgroup ~= "" then
-                lewtgroup = PZ.data[z.region].main.lewtgroup
+            local lewtkey = nil
+            local resolvedData = self.resolvedData
+
+            -- local bbb = container:getType()
+            -- local xxx = container:getParent()
+            -- local isa = instanceof(container, "IsoDeadBody") or (xxx and instanceof(xxx, "IsoZombie"))
+            -- local md = xxx:getModData()
+            -- md.PhunLewtChecked = true
+            -- Core.debug("PhunLewt: removeItemsFromContainer", tostring(container:getType()),
+            --     tostring(container:getItemContainer()))
+            if isZed or (container:getParent() and instanceof(container:getParent(), "IsoZombie")) or
+                container:getType() == "inventorymale" or container:getType() == "inventoryfemale" then
+                Core.debug("PhunLewt: checking zed loot for " .. tostring(container:getType()))
+                local md = container:getParent():getModData()
+                if md.PhunLewtChecked then
+                    return
+                end
+                md.PhunLewtChecked = true
+                if z.zedlewtkey and z.zedlewtkey ~= "" then
+                    lewtkey = z.zedlewtkey
+                elseif z.zone ~= "main" and PZ.data[z.region] and PZ.data[z.region].main and
+                    PZ.data[z.region].main.lewtkey and PZ.data[z.region].main.zedlewtkey ~= "" then
+                    lewtkey = PZ.data[z.region].main.zedlewtkey
+                end
+            else
+                if z.lewtkey and z.lewtkey ~= "" then
+                    lewtkey = z.lewtkey
+                elseif z.zone ~= "main" and PZ.data[z.region] and PZ.data[z.region].main and
+                    PZ.data[z.region].main.lewtkey and PZ.data[z.region].main.lewtkey ~= "" then
+                    lewtkey = PZ.data[z.region].main.lewtkey
+                end
             end
 
             local lookup = {
@@ -55,8 +88,8 @@ function Core:removeItemsFromContainer(container)
                 categories = {}
             }
 
-            if self.data[lewtgroup] then
-                lookup = self.data[lewtgroup]
+            if self.resolvedData[lewtkey] then
+                lookup = self.resolvedData[lewtkey]
             end
 
             local def = {
@@ -66,17 +99,10 @@ function Core:removeItemsFromContainer(container)
 
             local defaultReduction = 100
 
-            if lookup.extend ~= false then
-                if PZ.data["_default"] and PZ.data["_default"].main and PZ.data["_default"].main.lewtgroup and
-                    PZ.data["_default"].main.lewtgroup ~= "" then
-                    def = self.data[PZ.data["_default"].main.lewtgroup] or {
-                        items = {},
-                        categories = {}
-                    }
-                end
-                defaultReduction = self.settings.Default or 100
+            if lookup.default then
+                defaultReduction = lookup.default or 0
             else
-                defaultReduction = 0
+                defaultReduction = self.settings.Default or 0
             end
 
             if lookup.onempty ~= nil and lookup.onempty ~= "" then
@@ -109,7 +135,7 @@ function Core:removeItemsFromContainer(container)
                 end
                 print("PhunLewt " .. tostring(container:getType()) .. " at " .. tostring(square:getX()) .. ", " ..
                           tostring(square:getY()) .. ", " .. tostring(square:getZ()) .. ", config: " ..
-                          tostring(lewtgroup) .. adjustmentText .. " default reduction: " .. tostring(defaultReduction))
+                          tostring(lewtkey) .. adjustmentText .. " default reduction: " .. tostring(defaultReduction))
 
             end
 
@@ -317,12 +343,14 @@ function Core:setZoneData(data)
 end
 
 function Core:saveChanges(data)
+
     self.data = data
     ModData.add(self.name, data)
     if self.settings.Debug then
         PhunLib.debug("PhunLewt: saving data to ModData", data)
     end
     PL.file.saveTable(self.consts.luaDataFileName, {
+        groups = self.groups or {},
         data = data
     })
     Core:buildLookup()
