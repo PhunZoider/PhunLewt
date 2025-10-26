@@ -14,7 +14,7 @@ function UI.open(player, data)
 
     local playerIndex = player:getPlayerNum()
     local core = getCore()
-    local width = 400 * tools.FONT_SCALE
+    local width = 600 * tools.FONT_SCALE
     local height = 300 * tools.FONT_SCALE
 
     local x = (core:getScreenWidth() - width) / 2
@@ -122,43 +122,59 @@ function UI:createChildren()
     -- end
     -- self:addChild(self.controls.ok);
 
-    self.controls.new = ISButton:new(padding - 90, self.height - rh - padding - tools.FONT_HGT_SMALL, 80,
-        tools.FONT_HGT_SMALL + 4, getText("IGUI_PhunLewt_New"), self, UI.onNew);
+    local panel = ISPanel:new(w - 110, y, 100, 300 - padding);
+    panel.drawBorder = false
+    panel:initialise();
+    panel:instantiate();
+    panel.backgroundColor = {
+        r = 0.1,
+        g = 0.1,
+        b = 0.1,
+        a = 0.8
+    }
+    self:addChild(panel);
+    self.controls.panel = panel
+
+    local y = padding
+    self.controls.new = ISButton:new(padding, y, 80, tools.FONT_HGT_SMALL + 4, getText("IGUI_PhunLewt_New"), self,
+        UI.onNew);
     self.controls.new:initialise();
     self.controls.new:instantiate();
     self.controls.new:setEnable(true)
-    self:addChild(self.controls.new);
+    panel:addChild(self.controls.new);
 
-    self.controls.delete = ISButton:new(self.controls.new.x - 90, self.controls.new.y, 80, tools.FONT_HGT_SMALL + 4,
+    y = y + self.controls.new.height + padding
+    self.controls.delete = ISButton:new(self.controls.new.x, y, 80, tools.FONT_HGT_SMALL + 4,
         getText("IGUI_PhunLewt_Delete"), self, UI.onDelete);
     self.controls.delete:initialise();
     self.controls.delete:instantiate();
     self.controls.delete:setEnable(false)
-    self:addChild(self.controls.delete);
+    panel:addChild(self.controls.delete);
 
-    self.controls.edit = ISButton:new(self.controls.delete.x - 90, self.controls.delete.y, 80, tools.FONT_HGT_SMALL + 4,
+    y = y + self.controls.delete.height + padding
+    self.controls.edit = ISButton:new(self.controls.delete.x, y, 80, tools.FONT_HGT_SMALL + 4,
         getText("IGUI_PhunLewt_Edit"), self, UI.onEdit);
     self.controls.edit:initialise();
     self.controls.edit:instantiate();
     self.controls.edit:setEnable(false)
-    self:addChild(self.controls.edit);
+    panel:addChild(self.controls.edit);
 
-    self.controls.copy = ISButton:new(self.controls.edit.x - 90, self.controls.edit.y, 80, tools.FONT_HGT_SMALL + 4,
+    y = y + self.controls.edit.height + padding
+    self.controls.copy = ISButton:new(self.controls.edit.x, y, 80, tools.FONT_HGT_SMALL + 4,
         getText("IGUI_PhunLewt_Copy"), self, UI.onCopy);
     self.controls.copy:initialise();
     self.controls.copy:instantiate();
     self.controls.copy:setEnable(false)
-    self:addChild(self.controls.copy);
+    panel:addChild(self.controls.copy);
 
-    y = y + padding
+    y = panel.y
 
-    local list = tools.getListbox(x + padding, y, w - (padding * 2),
-        self.controls.new.y - y - padding - tools.HEADER_HGT, {getText("Item")}, {
-            draw = self.drawDatas,
-            click = self.click,
-            rightClick = self.click,
-            doubleClick = self.onEdit
-        });
+    local list = tools.getListbox(padding, y, panel.x - padding * 2, self.height - y - padding, {getText("Item")}, {
+        draw = self.drawDatas,
+        click = self.click,
+        rightClick = self.click,
+        doubleClick = self.onEdit
+    });
 
     list.lastSelectedRow = 1
     list.selected = 1
@@ -300,22 +316,22 @@ function UI:prerender()
 
     local padding = 10
     local ok = self.controls.new
-    ok:setX(ok.parent.width - ok.width - padding)
-    ok:setY(ok.parent.height - ok.height - self:resizeWidgetHeight() - 10)
+    -- ok:setX(ok.parent.width - ok.width - padding)
+    -- ok:setY(ok.parent.height - ok.height - self:resizeWidgetHeight() - 10)
 
     -- self.controls.new:setY(ok.y)
     -- self.controls.new:setX(self.controls.ok.x - self.controls.new.width - padding)
-    self.controls.delete:setY(ok.y)
-    self.controls.delete:setX(self.controls.new.x - self.controls.delete.width - padding)
-    self.controls.delete:setEnable(self.controls.list.selected > 0)
+    -- self.controls.delete:setY(ok.y)
+    -- self.controls.delete:setX(self.controls.new.x - self.controls.delete.width - padding)
+    -- self.controls.delete:setEnable(self.controls.list.selected > 0)
 
-    self.controls.edit:setY(ok.y)
-    self.controls.edit:setX(self.controls.delete.x - self.controls.edit.width - padding)
-    self.controls.edit:setEnable(self.controls.list.selected > 0)
+    -- self.controls.edit:setY(ok.y)
+    -- self.controls.edit:setX(self.controls.delete.x - self.controls.edit.width - padding)
+    -- self.controls.edit:setEnable(self.controls.list.selected > 0)
 
-    self.controls.copy:setY(ok.y)
-    self.controls.copy:setX(self.controls.edit.x - self.controls.copy.width - padding)
-    self.controls.copy:setEnable(self.controls.list.selected > 0)
+    -- self.controls.copy:setY(ok.y)
+    -- self.controls.copy:setX(self.controls.edit.x - self.controls.copy.width - padding)
+    -- self.controls.copy:setEnable(self.controls.list.selected > 0)
     -- local filterPanel = self.controls.filtersPanel
     -- filterPanel:setWidth(filterPanel.parent.width)
     -- filterPanel:setY(ok.y - 100)
@@ -331,9 +347,14 @@ function UI:prerender()
     -- filter:setWidth(filterCategory.x - filter.x - padding)
     -- filter:setY(lblFilterCategory.y + lblFilterCategory.height + padding)
 
+    local panel = self.controls.panel
+    panel:setX(self.width - panel.width - padding)
+    panel:setY(self:titleBarHeight() + padding)
+    panel:setHeight(self.height - self:titleBarHeight() - self:resizeWidgetHeight() - padding * 2)
+
     local list = self.controls.list
-    local listw = list.width - 20
-    list:setHeight(ok.y - list.y - padding - tools.HEADER_HGT)
+    local listw = panel.x - 20
+    -- list:setHeight(panel.height)
 
 end
 

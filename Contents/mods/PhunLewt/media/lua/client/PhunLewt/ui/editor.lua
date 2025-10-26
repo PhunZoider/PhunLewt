@@ -15,7 +15,7 @@ function UI.open(player, data)
 
     local playerIndex = player:getPlayerNum()
     local core = getCore()
-    local width = 450 * tools.FONT_SCALE
+    local width = 600 * tools.FONT_SCALE
     local height = 500 * tools.FONT_SCALE
 
     local x = (core:getScreenWidth() - width) / 2
@@ -63,7 +63,6 @@ function UI:requestInheritance(key)
 end
 
 function UI:recieveInheritance(inheritData)
-    print("PhunLewt: Received inheritance data")
     PL.debug("PhunLewt:recieveInheritance", inheritData)
     self.inherit = inheritData or {}
     self:refreshItems()

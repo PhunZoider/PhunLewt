@@ -9,9 +9,7 @@ local getGameTime = getGameTime
 local getSandboxOptions = getSandboxOptions
 
 function Core:getAdjustmentsForZone(region, zone)
-    if self.settings.Debug then
-        print("PhunLewt: getAdjustmentsForZone", region, zone)
-    end
+    Core.debug("PhunLewt: getAdjustmentsForZone", region, zone)
     return self.zoneLookups[region .. zone] or self.zoneLookups[region .. "main"]
 end
 
@@ -178,9 +176,8 @@ function Core:removeItemsFromContainer(container, isZed)
         if removed > 0 and container:isEmpty() then
             if defItem then
                 container:AddItem(defItem)
-                if Core.settings.Debug then
-                    print("PhunLewt: added default item " .. defItem .. " to container after removing all items")
-                end
+                Core.debug("PhunLewt: added default item " .. tostring(defItem) ..
+                               " to container after removing all items")
             end
             container:setExplored(true)
             container:setHasBeenLooted(true)
