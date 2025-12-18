@@ -1,7 +1,7 @@
 version=1
-id=3571334664
-title=PhunLewt Reducer 2 (Test)
-visibility=unlisted
+id=3606988132
+title=PhunLewt Reducer 2
+visibility=public
 description=A B41/B42 mod that lets admins customise loot spawning (and respawning) by area and time.
 description=
 description=This version improves on the original with:
@@ -59,7 +59,8 @@ description=[tr][td][b]Default Reduction[/b][/td][td]If nothing else is specifie
 description=[tr][td][b]Debug[/b][/td][td]Enable for verbose logs—very useful for troubleshooting and verifying setup.[/td][/tr]
 description=[/table]
 description=
-description=[url=https://discord.gg/v2USyAtP6q][img]https://i.ibb.co/p6bcnj2m/zcat.png[/img][/url]
+description=[H2]More Phun Stuff[/h2]
+description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3623897097][img]https://i.ibb.co/mCv5kDgy/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3388867450][img]https://i.ibb.co/x8H5KRhs/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3532685233][img]https://i.ibb.co/k6cQ4h7d/preview.png[/img][/url]
 description=
 description=Coded with love for our awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community.  
 description=Check out the [url=https://github.com/PhunZoider/PhunLewt]GitHub repo[/url] for more info.

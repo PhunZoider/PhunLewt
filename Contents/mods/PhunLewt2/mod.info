@@ -1,0 +1,7 @@
+name=PhunLewt
+id=phunlewt2
+author=UburGeek
+description=Zone based lewt reducer
+poster=poster.png
+icon=icon.png
+require=phunzones,phunlib
