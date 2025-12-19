@@ -100,14 +100,14 @@ end
 
 Commands[Core.commands.saveZoneData] = function(player, args)
     if args then
-        PL.debug("PhunLewt:saveZoneData", args, "--------")
+        Core.debug("PhunLewt:saveZoneData", args, "--------")
         Core:setZoneData(args)
     end
 end
 
 Commands[Core.commands.delete] = function(player, args)
     if args then
-        PL.debug("PhunLewt:saveZoneData", args, "--------")
+        Core.debug("PhunLewt:saveZoneData", args, "--------")
         Core.data[args.name] = nil
         Core:saveChanges(Core.data)
     end
@@ -115,7 +115,7 @@ end
 
 Commands[Core.commands.copy] = function(player, args)
     if args then
-        PL.debug("PhunLewt:copy", args, "--------")
+        Core.debug("PhunLewt:copy", args, "--------")
         Core.data[args.name .. "_copy"] = PL.table.deepCopy(Core.data[args.name])
         Core.data[args.name .. "_copy"].name = args.name .. "_copy"
         Core:saveChanges(Core.data)
@@ -124,7 +124,7 @@ end
 
 Commands[Core.commands.debug] = function(player, args)
     if args then
-        PL.debug("PhunLewt:debug", args, "--------")
+        Core.debug("PhunLewt:debug", args, "--------")
     end
 end
 

@@ -149,7 +149,7 @@ function Core:removeItemsFromContainer(container, isZed)
                             removed = removed + 1
                         end
                     elseif doDebug then
-                        print("   * no chance. Keeping")
+                        print("   * no reduction for " .. (name or "???") .. ". Keeping.")
                     end
                 end
             end
@@ -277,7 +277,7 @@ function Core:saveChanges(data)
     self.data = data
     ModData.add(self.name, data)
     if self.settings.Debug then
-        PhunLib.debug("PhunLewt: saving data to ModData", data)
+        Core.debug("PhunLewt: saving data to ModData", data)
     end
     PL.file.saveTable(self.consts.luaDataFileName, {
         groups = self.groups or {},

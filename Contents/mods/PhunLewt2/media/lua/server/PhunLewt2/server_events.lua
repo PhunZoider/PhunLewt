@@ -6,7 +6,7 @@ local Commands = require "PhunLewt2/server_commands"
 local Core = PhunLewt
 
 Events.OnFillContainer.Add(function(roomtype, containertype, container)
-    print("PhunLewt:OnFillContainer", roomtype, containertype, container)
+    Core.debugLn("OnFillContainer", roomtype, containertype, container)
     Core:removeItemsFromContainer(container)
 end);
 
@@ -20,4 +20,9 @@ end)
 
 Events.OnServerStarted.Add(function()
     Core:ini()
+end)
+
+Events.EveryTenMinutes.Add(function()
+    -- refresh periodically so we aren't constantly reading from function
+    Core.settings.Debug = Core.getOption("Debug", false)
 end)
