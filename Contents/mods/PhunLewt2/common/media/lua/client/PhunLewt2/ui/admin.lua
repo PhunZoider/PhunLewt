@@ -4,10 +4,12 @@ end
 
 require "DebugUIs/DebugMenu/ISDebugMenu"
 local Core = PhunLewt
-
+local PL = PhunLib
 local function showPhunLewtConfigs()
-    Core.showLoadingModal()
-    sendClientCommand(Core.name, Core.commands.requestNames, {})
+    if PL.isAdmin(getPlayer()) then
+        Core.showLoadingModal()
+        sendClientCommand(Core.name, Core.commands.requestNames, {})
+    end
 end
 
 local ISDebugMenu_setupButtons = ISDebugMenu.setupButtons;
