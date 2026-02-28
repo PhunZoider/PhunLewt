@@ -1,7 +1,6 @@
 name=PhunLewt
-id=phunlewt2
+id=phunlewt2b
 author=UburGeek
 description=Zone based lewt reducers and respawner
 poster=poster.png
 icon=icon.png
-require=\phunzones,\phunlib

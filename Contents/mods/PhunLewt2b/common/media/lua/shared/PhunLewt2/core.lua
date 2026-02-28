@@ -1,5 +1,3 @@
-require "PhunLib/core"
-
 PhunLewt = {
     name = "PhunLewt",
     consts = {
@@ -29,7 +27,7 @@ PhunLewt = {
 }
 
 local Core = PhunLewt
-local PL = PhunLib
+
 Core.isLocal = not isClient() and not isServer() and not isCoopHost()
 Core.settings = SandboxVars[Core.name] or {}
 for _, event in pairs(Core.events) do
@@ -46,7 +44,7 @@ end
 
 function Core.debug(...)
     if Core.settings.Debug then
-        PL.debug(Core.name, ...)
+        Core.tools.debug(Core.name, ...)
     end
 end
 
@@ -79,7 +77,7 @@ function Core:getCategoryLookup(refresh)
     for i = 0, itemList:size() - 1 do
         local item = itemList:get(i)
         if not item:getObsolete() and not item:isHidden() then
-            local cat = PL.getCategory(item) or ""
+            local cat = Core.tools.getCategory(item) or ""
             results[item:getFullName()] = cat
         end
     end

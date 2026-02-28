@@ -4,7 +4,7 @@ end
 require "PhunLewt2/ui/base"
 local tools = require "PhunLewt2/ui/tools"
 local Core = PhunLewt
-local PL = PhunLib
+
 local profileName = "PhunLewtCats"
 Core.ui.cats = PhunLewtBase:derive(profileName);
 local UI = Core.ui.cats
@@ -105,7 +105,7 @@ function UI:refreshData()
     self.controls.list:clear();
     self.lastSelected = nil
 
-    local categories = PL.getAllItemCategories() or {}
+    local categories = Core.tools.getAllItemCategories() or {}
 
     local merged = {}
     for k, v in pairs(self.data.inherit or {}) do

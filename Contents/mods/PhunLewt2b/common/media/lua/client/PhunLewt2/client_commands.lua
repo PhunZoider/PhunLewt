@@ -3,11 +3,11 @@ if isServer() then
 end
 
 local Core = PhunLewt
-local PL = PhunLib
+
 local Commands = {}
 
 Commands[Core.commands.requestData] = function(args)
-    local player = PL.getPlayerByUsername(args.username)
+    local player = Core.tools.getPlayerByUsername(args.username)
     if player then
         Core.configNames = args.names or {}
         args.username = nil
@@ -17,7 +17,7 @@ Commands[Core.commands.requestData] = function(args)
 end
 
 Commands[Core.commands.requestInheritance] = function(args)
-    local player = PL.getPlayerByUsername(args.username)
+    local player = Core.tools.getPlayerByUsername(args.username)
     if player then
         args.username = nil
         triggerEvent(Core.events.OnReceiveInheritance, args.inherit or {})
@@ -25,7 +25,7 @@ Commands[Core.commands.requestInheritance] = function(args)
 end
 
 Commands[Core.commands.requestNames] = function(args)
-    local player = PL.getPlayerByUsername(args.username)
+    local player = Core.tools.getPlayerByUsername(args.username)
     if player then
         args.username = nil
         Core.configNames = args.names or {}
@@ -35,7 +35,7 @@ Commands[Core.commands.requestNames] = function(args)
 end
 
 Commands[Core.commands.requestConfigNames] = function(args)
-    local player = PL.getPlayerByUsername(args.username)
+    local player = Core.tools.getPlayerByUsername(args.username)
     if player then
         args.username = nil
         Core.configNames = args.names or {}

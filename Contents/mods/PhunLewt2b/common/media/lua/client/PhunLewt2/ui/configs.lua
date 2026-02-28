@@ -3,7 +3,6 @@ if isServer() then
 end
 local tools = require "PhunLewt2/ui/tools"
 local Core = PhunLewt
-local PL = PhunLib
 local profileName = "PhunLewtCongfigs"
 
 Core.ui.configs = ISCollapsableWindowJoypad:derive(profileName);
@@ -20,7 +19,7 @@ function UI.open(player, data)
     local x = (core:getScreenWidth() - width) / 2
     local y = (core:getScreenHeight() - height) / 2
 
-    local instance = UI:new(x, y, width, height, player, playerIndex, PL.table.deepCopy(data));
+    local instance = UI:new(x, y, width, height, player, playerIndex, Core.tools.deepCopy(data));
 
     instance:initialise();
 

@@ -2,7 +2,6 @@ if isClient() then
     return
 end
 local Core = PhunLewt
-local PL = PhunLib
 local PZ = PhunZones
 
 local getGameTime = getGameTime
@@ -108,9 +107,10 @@ function Core:removeItemsFromContainer(container, isZed)
             if doDebug then
                 local adjustmentText = ""
                 if adjustment < 1 then
-                    adjustmentText = " adjustment: " .. PL.string.formatWholeNumber(adjustment * 100) .. "% (hours: " ..
-                                         tostring(hours) .. " of " ..
-                                         PL.string.formatWholeNumber(getGameTime():getWorldAgeHours()) .. ") "
+                    adjustmentText =
+                        " adjustment: " .. Core.tools.formatWholeNumber(adjustment * 100) .. "% (hours: " ..
+                            tostring(hours) .. " of " .. Core.tools.formatWholeNumber(getGameTime():getWorldAgeHours()) ..
+                            ") "
 
                 end
                 print("PhunLewt " .. tostring(container:getType()) .. " at " .. tostring(square:getX()) .. ", " ..
@@ -140,7 +140,7 @@ function Core:removeItemsFromContainer(container, isZed)
                         if doDebug then
                             print("   * " .. (name or "???") .. " (" .. (category or "???") .. "): " .. ": " ..
                                       tostring(chance) .. "%, adjusted to " ..
-                                      PL.string.formatWholeNumber(chance * adjustment) .. "%, rolled: " ..
+                                      Core.tools.formatWholeNumber(chance * adjustment) .. "%, rolled: " ..
                                       tostring(rand) .. (rand < (chance * adjustment) and " = removing" or " = keeping"))
                         end
 
@@ -279,7 +279,7 @@ function Core:saveChanges(data)
     if self.settings.Debug then
         Core.debug("PhunLewt: saving data to ModData", data)
     end
-    PL.file.saveTable(self.consts.luaDataFileName, {
+    Core.tools.saveTable(self.consts.luaDataFileName, {
         groups = self.groups or {},
         data = data
     })

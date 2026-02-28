@@ -4,7 +4,6 @@ end
 require "PhunLewt2/ui/base"
 local tools = require "PhunLewt2/ui/tools"
 local Core = PhunLewt
-local PL = PhunLib
 local profileName = "PhunLewtItems"
 Core.ui.items = PhunLewtBase:derive(profileName);
 local UI = Core.ui.items
@@ -117,7 +116,7 @@ function UI:createChildren()
 
     -- data
     self.data.selectedItems = {}
-    self.data.categories = PL.getAllItemCategories()
+    self.data.categories = Core.tools.getAllItemCategories()
 
     -- sort categories
     local catMap = {}
@@ -154,7 +153,7 @@ function UI:createChildren()
     end
 
     if allItems == nil then
-        allItems = PL.getAllItems()
+        allItems = Core.tools.getAllItems()
     end
     self.allItems = allItems
 

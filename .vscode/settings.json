@@ -2,134 +2,84 @@
     "emeraldwalk.runonsave": {
         "autoClearConsole": true,
         "commands": [
-            // del dest
+            // Delete old local mod folder
             {
                 "match": ".*",
-                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2 2>nul"
+                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2b 2>nul"
             },
-            // copy src to dest
+            // Copy mod files to local mod folder
             {
                 "match": ".*",
                 "cmd": "xcopy ${workspaceFolder}\\Contents\\mods ${env.USERPROFILE}\\Zomboid\\mods /Y /I /E /F /EXCLUDE:xclude"
             },
-            // del Tests folder from deployment
+			// Delete old local workshop folder
             {
                 "match": ".*",
-                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2\\Tests 2>nul"
-            },             
-            // copy src/media/* from dest to dest/42.0.0
-            {
-                "match": ".*",
-                "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunLewt2\\media ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2\\42.0.0\\media /Y /I /E /F"
+                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2b 2>nul"
             },
-            // copy src/common to dest/common
+			// Copy contents to local workshop folder
             {
                 "match": ".*",
-                "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunLewt2\\common ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2\\common /Y /I /E /F"
+                "cmd": "xcopy ${workspaceFolder} ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2b /Y /I /E /F /EXCLUDE:xclude"
             },
+            // del Tests folder from local workshop
             {
                 "match": ".*",
-                "cmd": "del ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2\\42.0.0\\media\\lua\\client\\PhunLewt2\\ui\\admin.lua"
-            },            
-            // copy src/mod.info to dest/42.0.0/mod.info
-            // {
-            //     "match": ".*",
-            //     "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunLewt2\\42.0.0\\mod.info ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2\\42.0.0\\mod.info /Y"
-            // },
-            // copy src/poster to dest/42.0.0/poster
-            {
-                "match": ".*",
-                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunLewt2\\poster.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2\\42.0.0\\poster.png /Y"
-            },
-            // copy src/icon to dest/42.0.0/icon
-            {
-                "match": ".*",
-                "cmd": "copy ${workspaceFolder}\\Contents\\mods\\PhunLewt2\\icon.png ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2\\42.0.0\\icon.png /Y"
-            },
-            // remove workshop/*
-            {
-                "match": ".*",
-                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2 2>nul"
-            },
-            // copy src to workshop
-            {
-                "match": ".*",
-                "cmd": "xcopy ${workspaceFolder} ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2 /Y /I /E /F /EXCLUDE:xclude"
-            },
-            // del Tests folder from deployment
-            {
-                "match": ".*",
-                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2\\Tests 2>nul"
+                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2b\\Tests 2>nul"
             },              
-            // copy dest to workshop
-            {
-                "match": ".*",
-                "cmd": "xcopy ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2 ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2\\Contents\\mods\\PhunLewt2 /Y /I /E /F"
-            },
-            // del pz41
-            {
-                "match": ".*",
-                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\pz41\\mods\\PhunLewt2 2>nul"
-            },
-            // copy dest to pz41
-            {
-                "match": ".*",
-                "cmd": "xcopy ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2 ${env.USERPROFILE}\\pz41\\mods\\PhunLewt2 /Y /I /E /F /EXCLUDE:xclude"
-            },
 
 
+            // TESTING VERSION
 
-            // TESTING STUFF
-
-            // del TEST mod
+            // del TEST local mod
             {
                 "match": ".*",
-                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2Test 2>nul"
+                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2bTest 2>nul"
             },
 
             // copy TEST from live
             {
                 "match": ".*",
-                "cmd": "xcopy ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2 ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2Test /Y /I /E /F /EXCLUDE:xclude"
+                "cmd": "xcopy ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2b ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2bTest /Y /I /E /F /EXCLUDE:xclude"
             },            
 
             // copy TEST overrides
             {
                 "match": ".*",
-                "cmd": "xcopy ${workspaceFolder}\\Tests\\root ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2Test /Y /I /E /F /EXCLUDE:xclude"
+                "cmd": "xcopy ${workspaceFolder}\\Tests\\root ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2bTest /Y /I /E /F /EXCLUDE:xclude"
             }, 
 
             // remove TEST workshop
             {
                 "match": ".*",
-                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2Test 2>nul"
+                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2bTest 2>nul"
             },            
             // copy src to TEST workshop
             {
                 "match": ".*",
-                "cmd": "xcopy ${workspaceFolder} ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2Test /Y /I /E /F /EXCLUDE:xclude"
+                "cmd": "xcopy ${workspaceFolder} ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2bTest /Y /I /E /F /EXCLUDE:xclude"
             },
             // del Tests folder from deployment
             {
                 "match": ".*",
-                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2Test\\Tests 2>nul"
-            },            
-            // copy TEST mods to workshop version
+                "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2bTest\\Tests 2>nul"
+            },
+            // copy TEST mod root overrides (mod.info, icon, poster) into workshop mod subfolder
             {
                 "match": ".*",
-                "cmd": "xcopy ${env.USERPROFILE}\\Zomboid\\mods\\PhunLewt2Test ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2Test\\Contents\\mods\\PhunLewt2 /Y /I /E /F"
+                "cmd": "xcopy ${workspaceFolder}\\Tests\\root ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2bTest\\Contents\\mods\\PhunLewt2b /Y /I /E /F"
             },
 
             // copy TEST preview file to workshop version
             {
                 "match": ".*",
-                "cmd": "xcopy ${workspaceFolder}\\Tests\\preview.png ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2Test\\preview.png /Y /I /E /F"
+                "cmd": "xcopy ${workspaceFolder}\\Tests\\preview.png ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2bTest\\preview.png /Y /I /E /F"
             }, 
             // Copy TEST workshop file to workshop version
             {
                 "match": ".*",
-                "cmd": "xcopy ${workspaceFolder}\\Tests\\workshop.txt ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2Test\\workshop.txt /Y /I /E /F"
-            },  
+                "cmd": "xcopy ${workspaceFolder}\\Tests\\workshop.txt ${env.USERPROFILE}\\Zomboid\\Workshop\\PhunLewt2bTest\\workshop.txt /Y /I /E /F"
+            }, 
 
         ]
     },

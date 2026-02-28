@@ -3,7 +3,6 @@ if isClient() then
 end
 
 local Core = PhunLewt
-local PL = PhunLib
 local Commands = {}
 
 Commands[Core.commands.requestInheritance] = function(player, args)
@@ -38,7 +37,7 @@ Commands[Core.commands.requestData] = function(player, args)
         inherited = Core.resolvedData[data.inherit] or {}
     end
     if data then
-        local copy = PL.table.deepCopy(data)
+        local copy = Core.tools.deepCopy(data)
         if Core.isLocal then
             Core.editZoneData(player, {
                 data = copy,
@@ -116,7 +115,7 @@ end
 Commands[Core.commands.copy] = function(player, args)
     if args then
         Core.debug("PhunLewt:copy", args, "--------")
-        Core.data[args.name .. "_copy"] = PL.table.deepCopy(Core.data[args.name])
+        Core.data[args.name .. "_copy"] = Core.tools.deepCopy(Core.data[args.name])
         Core.data[args.name .. "_copy"].name = args.name .. "_copy"
         Core:saveChanges(Core.data)
     end

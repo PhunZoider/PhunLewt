@@ -3,7 +3,6 @@ if isClient() then
 end
 require "PhunLewt2/core"
 local Core = PhunLewt
-local PL = PhunLib
 
 -- Deep copy helper
 local function deepcopy(orig)
@@ -98,7 +97,7 @@ function Core:getSavedData()
 
     -- load Lua/PhunLewt.lua data into ModData
     local data = {}
-    local d = PL.file.loadTable(self.consts.luaDataFileName)
+    local d = Core.tools.loadTable(self.consts.luaDataFileName)
     if d == nil then
         print("PhunLewt: missing ./lua/" .. self.consts.luaDataFileName ..
                   ", this is normal if you haven't modified any zones")
@@ -194,7 +193,7 @@ function Core:getSavedData()
                 end
             end
             -- re-save
-            PL.file.saveTable(self.consts.luaDataFileName, newStruct)
+            Core.tools.saveTable(self.consts.luaDataFileName, newStruct)
             print("PhunLewt: converted legacy ./lua/" .. self.consts.luaDataFileName .. " to new format")
             d = newStruct
         end
