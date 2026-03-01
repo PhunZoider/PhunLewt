@@ -4,7 +4,8 @@ PhunLewt = {
         itemType = {
             items = "items"
         },
-        luaDataFileName = "PhunLewt.lua"
+        luaDataFileName = "PhunLewt.lua",
+        defaultConfigKey = "default"
     },
     data = {},
     commands = {
@@ -19,7 +20,7 @@ PhunLewt = {
         copy = "copy"
     },
     events = {
-        onReady = "PhunLewtOnReady",
+        OnReady = "PhunLewtOnReady",
         OnReceiveInheritance = "PhunLewtOnReceiveInheritance"
     },
     tools = require "PhunLewt2/tools",

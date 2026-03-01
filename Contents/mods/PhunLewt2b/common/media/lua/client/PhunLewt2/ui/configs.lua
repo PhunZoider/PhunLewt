@@ -173,7 +173,7 @@ function UI:onNew()
     local modal = ISTextBox:new(0, 0, 280, 180, "Name:", "", nil, function(target, button, obj)
         if button.internal == "OK" then
             local name = button.parent.entry:getText()
-            if name and name ~= "" and self.data[name] == nil then
+            if name and name ~= "" and name ~= Core.consts.defaultConfigKey and self.data[name] == nil then
                 table.insert(self.data, name)
                 table.sort(self.data, function(a, b)
                     return a:lower() < b:lower()
@@ -198,6 +198,9 @@ function UI:onDelete()
         return
     end
     local item = list.items[list.selected].item
+    if item == Core.consts.defaultConfigKey then
+        return
+    end
     if item then
         local w = 300
         local h = 200
@@ -302,7 +305,12 @@ function UI:prerender()
     local padding = 10
     local ok = self.controls.new
 
-    self.controls.delete:setEnable(self.controls.list.selected > 0)
+    local selectedItem = self.controls.list.selected > 0 and
+        self.controls.list.items[self.controls.list.selected] and
+        self.controls.list.items[self.controls.list.selected].item or nil
+    local isDefault = selectedItem == Core.consts.defaultConfigKey
+
+    self.controls.delete:setEnable(self.controls.list.selected > 0 and not isDefault)
 
     self.controls.edit:setEnable(self.controls.list.selected > 0)
 

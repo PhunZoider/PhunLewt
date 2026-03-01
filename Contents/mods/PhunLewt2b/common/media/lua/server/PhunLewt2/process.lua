@@ -200,6 +200,15 @@ function Core:getSavedData()
     for k, v in pairs(data) do
         v.name = k
     end
+    -- Ensure the reserved default config always exists in memory
+    if not data[Core.consts.defaultConfigKey] then
+        data[Core.consts.defaultConfigKey] = {
+            name = Core.consts.defaultConfigKey,
+            categories = {},
+            items = {},
+            default = 0
+        }
+    end
     Core:buildLookup()
     Core.data = data
     Core.debug("PhunLewt:getSavedData", data, "--------")

@@ -17,11 +17,17 @@ if activeMods:contains("\\phunzones2") or activeMods:contains("\\phunzones2test"
             sendClientCommand(Core.name, Core.commands.requestConfigNames, {})
         end,
         getOptions = function()
-            local options = {" "}
+            local options = {{
+                label = " ",
+                value = "none"
+            }}
             local names = Core.configNames or {}
             table.sort(names)
             for i, name in ipairs(names) do
-                table.insert(options, name)
+                table.insert(options, {
+                    label = name,
+                    value = name
+                })
             end
             return options
         end

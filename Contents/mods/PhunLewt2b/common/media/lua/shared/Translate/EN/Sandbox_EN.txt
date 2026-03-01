@@ -3,7 +3,4 @@ Sandbox_EN = {
     Sandbox_PhunLewt_Debug = "Debug",
     Sandbox_PhunLewt_Debug_tooltip = "Print verbose output into logs. Useful for... well, debugging",
 
-    Sandbox_PhunLewt_Default = "Default Reduction",
-    Sandbox_PhunLewt_Default_tooltip = "Reduce loot spawn by this percentage when no other value is set. For example, if this value is 10 - all loot will reduce spawning in containers by 10% unless otherwise specificed in your zone configuration. Requires restart",
-
 }

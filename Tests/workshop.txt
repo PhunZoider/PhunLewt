@@ -1,4 +1,4 @@
 version=1
-title=PhunLewt Reducer 2b [Dev]
+title=PhunLewt Reducer 2.1 [Dev]
 description=development and testing version of [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3606988132]PhunLewt2[/url]
 visibility=hidden

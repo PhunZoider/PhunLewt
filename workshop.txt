@@ -1,25 +1,12 @@
 version=1
-id=3606988132
-title=PhunLewt Reducer 2
+title=PhunLewt Reducer 2.1
 visibility=public
-description=A B41/B42 mod that lets admins customise loot spawning (and respawning) by area and time.
+description=⚠️ DEV BRANCH — Preview build for testing and feedback. This version may change frequently and could break between updates.
 description=
-description=This version improves on the original with:
-description=[list]
-description=[*]Instead of setting all the values per zone, you now create a configuration that you apply to a zone. This allows for easy setup and reuse
-description=[*]Inherit other configs to make changes easier
-description=[*]Overall, it is just miles better than the previous version
-description=[/list]
-description=
-description=[h1]IMPORTANT[/h1]
-description=[list]
-description=[*]This mod only reduces loot when the game spawns or respawns items in a container.
-description=[*]It will not reduce loot in containers that are baked into the map (many custom maps ship with loot already in containers). However it will apply once those containers restock (if the map supports it).
-description=[*]It cannot force loot to respawn in custom maps that are missing or have broken forage zones. Basically if the game won't restock the container, this mod won't be able to change that
-description=[/list]
+description=Fine tune loot spawns and respawns by area and time by reducing their chance of spawn
 description=
 description=[h1]Quick Start[/h1]
-description=It is best to start with a [b]Global Default Configuration[/b]. These values apply anywhere no other configuration exists.
+description=It is best to start with the [b]Default[/b]. These values apply anywhere no other configuration exists.
 description=
 description=[img]https://i.ibb.co/B2H4wnDj/pl-default1.png[/img]
 description=[list]
@@ -33,11 +20,20 @@ description=[*]When done, click [b]OK[/b] to save
 description=[/list]
 description=[img]https://i.ibb.co/xSdvrdTM/pl-default3.png[/img]
 description=[list]
-description=[*]Now open [b]PhunZones[/b] from the Admin or Debug menu
+description=[*]If using [b]PhunZones[/b], open [b]PhunZones[/b] from the Admin or Debug menu
 description=[*]Select [i]- Defaults -[/i] (first entry) and click [b]Edit Region[/b]
 description=[*]Scroll to the bottom, find [b]Lewt Config[/b], and select your new configuration
 description=[/list]
 description=Any changes to this configuration now apply globally.
+description=
+description=[h2]IMPORTANT[/h2]
+description=[list]
+description=[*]This mod only reduces loot when the game spawns or respawns items in a container.
+description=[*]It will not reduce loot in containers that are already baked into the map (eg a custom map that ships with loot already in containers). However it will apply once those containers restock.
+description=[*]It cannot force loot to respawn in custom maps that are missing or have broken forage zones. Basically if the game won't restock the container, this mod won't be able to change that
+description=[*]As of 2.1, there are no dependencies. If you do not have PhunZones installed, only your default config is used
+description=[*]Remember, the values [b]reduce[/b] loot spawns. 100 = 100% reduction and 0 = no reduction!
+description=[/list]
 description=
 description=[h1]Configuration Settings[/h1]
 description=
@@ -55,12 +51,11 @@ description=
 description=[h1]Sandbox Settings[/h1]
 description=[table]
 description=[tr][th]Setting[/th][th]Description[/th][/tr]
-description=[tr][td][b]Default Reduction[/b][/td][td]If nothing else is specified, reduce loot by this percentage.[/td][/tr]
 description=[tr][td][b]Debug[/b][/td][td]Enable for verbose logs—very useful for troubleshooting and verifying setup.[/td][/tr]
 description=[/table]
 description=
-description=[H2]More Phun Stuff[/h2]
-description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3623897097][img]https://i.ibb.co/mCv5kDgy/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3388867450][img]https://i.ibb.co/x8H5KRhs/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3532685233][img]https://i.ibb.co/k6cQ4h7d/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3628843367][img]https://i.ibb.co/wrZbknjt/preview.png[/img][/url]
+[h2]More Phun Stuff[/h2]
+[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3674596146][img]https://i.ibb.co/3mQpB8ST/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3674596402][img]https://i.ibb.co/d4y0BhnF/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3623897097][img]https://i.ibb.co/mCv5kDgy/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3674595589][img]https://i.ibb.co/fYNn5BLC/preview.png[/img][/url]
 description=
 description=Coded with love for our awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community.  
 description=Check out the [url=https://github.com/PhunZoider/PhunLewt]GitHub repo[/url] for more info.

@@ -213,6 +213,37 @@ function tools.isAdmin(player, ignoreLocal)
 
 end
 
+function tools.formatWholeNumber(n)
+    n = tonumber(n) or 0
+    -- Round half-up (works for positives; good enough for UI values)
+    local rounded = math.floor(n + 0.5)
+
+    local s = tostring(rounded)
+    local sign = ""
+
+    if s:sub(1, 1) == "-" then
+        sign = "-"
+        s = s:sub(2)
+    end
+
+    -- Insert commas
+    local rev = s:reverse()
+    rev = rev:gsub("(%d%d%d)", "%1,")
+    s = rev:reverse():gsub("^,", "")
+
+    return sign .. s
+end
+
+function tools.formatNumber(number, decimals)
+    number = number or 0
+    -- Round the number to remove the decimal part
+    local roundedNumber = math.floor(number + (decimals and 0.005 or 0.5))
+    -- Convert to string and format with commas
+    local formattedNumber = tostring(roundedNumber):reverse():gsub("(%d%d%d)", "%1,")
+    formattedNumber = formattedNumber:reverse():gsub("^,", "")
+    return formattedNumber
+end
+
 -- ---------------------------------------------------------------------------
 -- SHALLOW COPY
 -- Returns a shallow copy of a table, optionally excluding specified keys.

@@ -21,10 +21,10 @@ function Core.removeItemsFromContainer(container, isZed)
         square = parent:getSquare()
     end
 
-    if square and self.resolvedData then
+    if square and Core.resolvedData then
         local items = container and container.getItems and container:getItems()
         local removed = 0
-        local doDebug = self.settings.Debug or false
+        local doDebug = Core.settings.Debug or false
 
         if items and items:size() > 0 then
 
@@ -48,41 +48,17 @@ function Core.removeItemsFromContainer(container, isZed)
                 md.PhunLewtChecked = true
             end
 
-            local lookup = {
-                items = {},
-                categories = {}
-            }
+            local lookup = Core.resolvedData[lewtkey]
+                or Core.resolvedData[Core.consts.defaultConfigKey]
+                or { items = {}, categories = {} }
 
-            if self.resolvedData[lewtkey] then
-                lookup = self.resolvedData[lewtkey]
-            end
-
-            local def = {
-                items = {},
-                categories = {}
-            }
-
-            local defaultReduction = 100
-
-            if lookup.default then
-                defaultReduction = lookup.default or 0
-            else
-                defaultReduction = self.settings.Default or 0
-            end
+            local defaultReduction = lookup.default or 0
 
             if lookup.onempty ~= nil and lookup.onempty ~= "" then
                 defItem = lookup.onempty
-            elseif def.onempty ~= nil and def.onempty ~= "" then
-                defItem = def.onempty
             end
 
-            local hours = nil
-
-            if lookup.hours and lookup.hours > 0 then
-                hours = lookup.hours
-            elseif def.hours and def.hours > 0 then
-                hours = def.hours
-            end
+            local hours = (lookup.hours and lookup.hours > 0) and lookup.hours or nil
 
             if hours ~= nil then
                 if getGameTime():getWorldAgeHours() < hours then
@@ -114,10 +90,6 @@ function Core.removeItemsFromContainer(container, isZed)
                     local chance = (lookup.items and lookup.items[name]) or
                                        (lookup.categories and lookup.categories[category]) or nil
 
-                    -- if we have a value, its been specified. If not and we are not in default region, check default
-                    if chance == nil then
-                        chance = def.items[name] or def.categories[category] or nil
-                    end
                     if chance == nil then
                         chance = defaultReduction
                     end
