@@ -1,66 +1,50 @@
 version=1
-title=PhunLewt Reducer 2.1
+title=PhunLewt 2.1
 visibility=public
 description=⚠️ DEV BRANCH — Preview build for testing and feedback. This version may change frequently and could break between updates.
 description=
 description=Fine tune loot spawns and respawns by area and time by reducing their chance of spawn
 description=
-description=[h1]Quick Start[/h1]
-description=It is best to start with the [b]Default[/b]. These values apply anywhere no other configuration exists.
+description=[h1]Setup[/h1]
+description=Open the configs window by clicking the PhunLewts button in the Admin or Debug window
+description=[url=https://ibb.co/Vc657PcM][img]https://i.ibb.co/zTdDy0TP/configs-cropped.png[/img][/url]
 description=
-description=[img]https://i.ibb.co/B2H4wnDj/pl-default1.png[/img]
-description=[list]
-description=[*]Open the [b]PhunLewt[/b] editor from the Admin or Debug menu
-description=[*]Click [b]New[/b] and give your configuration a name
-description=[/list]
-description=[img]https://i.ibb.co/0RTrgY57/pl-default2.png[/img]
-description=[list]
-description=[*]Double-click any item or category and set the percentage to reduce respawn by (e.g. 10 = 10% reduction)
-description=[*]When done, click [b]OK[/b] to save
-description=[/list]
-description=[img]https://i.ibb.co/xSdvrdTM/pl-default3.png[/img]
-description=[list]
-description=[*]If using [b]PhunZones[/b], open [b]PhunZones[/b] from the Admin or Debug menu
-description=[*]Select [i]- Defaults -[/i] (first entry) and click [b]Edit Region[/b]
-description=[*]Scroll to the bottom, find [b]Lewt Config[/b], and select your new configuration
-description=[/list]
-description=Any changes to this configuration now apply globally.
+description=This is a list of all your different configurations. The [b]Default[/b] profile is the configuration used if you are not using with [b]PhunZones[/b] or if the zone you are in does not specify a configuration. It's the perfect place for your global defaults!
+description=
+description=Let's make ammo really rare. To do so, I'll edit the default config, click the [b]Categories[/b] tab, edit the Ammo category and set it to 90
+description=[url=https://ibb.co/mrZzBHxh][img]https://i.ibb.co/fV60SCcr/default-cats-cropped.png[/img][/url]
+description=
+description=That makes ALL items in that category reduce their spawn by 90%.
+description=Now, let's say I want no ammo spawning in certain places. To do this, I create a new config, inherit from default (which has the 90% reduction for ammo) and change the Ammo value to 100
+description=[url=https://ibb.co/WN7sXfvV][img]https://i.ibb.co/rKqvhH2d/custom-cropped.png[/img][/url]
+description=
+description=I can then assign that config to a zone via the [b]PhunZones[/b] editor
+description=[url=https://ibb.co/Q3QCywFz][img]https://i.ibb.co/XrL3cRZN/phunzone-cropped.png[/img][/url]
 description=
 description=[h2]IMPORTANT[/h2]
 description=[list]
 description=[*]This mod only reduces loot when the game spawns or respawns items in a container.
-description=[*]It will not reduce loot in containers that are already baked into the map (eg a custom map that ships with loot already in containers). However it will apply once those containers restock.
+description=[*]It cannot reduce loot in containers that are already filled (eg a custom map that ships with loot already in containers). However it will apply when those containers restock. That also means that changes in your config will not affect containers that have already been stocked
 description=[*]It cannot force loot to respawn in custom maps that are missing or have broken forage zones. Basically if the game won't restock the container, this mod won't be able to change that
-description=[*]As of 2.1, there are no dependencies. If you do not have PhunZones installed, only your default config is used
+description=[*]There are no longer dependencies required, however it is [b]strongly suggested[/b] that you use [b]PhunZones[/b]. Without it, only your default config is used
 description=[*]Remember, the values [b]reduce[/b] loot spawns. 100 = 100% reduction and 0 = no reduction!
 description=[/list]
 description=
 description=[h1]Configuration Settings[/h1]
 description=
-description=[img]https://i.ibb.co/HfPcmbyp/pl-inherit.png[/img]
-description=
 description=[table]
 description=[tr][th]Setting[/th][th]Description[/th][/tr]
 description=[tr][td][b]Name[/b][/td][td]Unique name for this configuration.[/td][/tr]
 description=[tr][td][b]Default[/b][/td][td]Applies to all categories not explicitly defined here or in inherited configs. Leave blank to ignore.[/td][/tr]
-description=[tr][td][b]Hours Till Full[/b][/td][td]How long (in in-game hours) it takes for the full reduction to apply. Example: if Aviator Glasses are set to 50% and this is 240 hours (10 game days), the reduction ramps from 0% → 50% over that time.[/td][/tr]
+description=[tr][td][b]Hours Till Full[/b][/td][td]How long (in in-game hours) it takes for the full reduction to apply. Example: if Clothing is set to 50% and this is 240 hours (10 game days), the reduction ramps from 0% → 50% over that time.[/td][/tr]
 description=[tr][td][b]On Empty Add Item[/b][/td][td]If a restocked container ends up empty, this item is added as a visual cue that a restock occurred.[/td][/tr]
 description=[tr][td][b]Inherit[/b][/td][td]Inherit values from another configuration (and its parents). Usually, you’ll want to inherit from your Global Default config.[/td][/tr]
 description=[/table]
 description=
-description=[h1]Sandbox Settings[/h1]
-description=[table]
-description=[tr][th]Setting[/th][th]Description[/th][/tr]
-description=[tr][td][b]Debug[/b][/td][td]Enable for verbose logs—very useful for troubleshooting and verifying setup.[/td][/tr]
-description=[/table]
-description=
-[h2]More Phun Stuff[/h2]
-[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3674596146][img]https://i.ibb.co/3mQpB8ST/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3674596402][img]https://i.ibb.co/d4y0BhnF/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3623897097][img]https://i.ibb.co/mCv5kDgy/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3674595589][img]https://i.ibb.co/fYNn5BLC/preview.png[/img][/url]
+description=[h2]More Phun Stuff[/h2]
+description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3674596146][img]https://i.ibb.co/3mQpB8ST/preview.png[/img][/url]
+description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3674596402][img]https://i.ibb.co/d4y0BhnF/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3623897097][img]https://i.ibb.co/mCv5kDgy/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3674595589][img]https://i.ibb.co/fYNn5BLC/preview.png[/img][/url]
 description=
 description=Coded with love for our awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community.  
 description=Check out the [url=https://github.com/PhunZoider/PhunLewt]GitHub repo[/url] for more info.
-require=phunzones
-tags=Build 41;Build 42;Multiplayer
-
-
-
+tags=Build 42;Multiplayer
