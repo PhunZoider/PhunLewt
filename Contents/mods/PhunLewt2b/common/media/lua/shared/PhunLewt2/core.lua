@@ -62,8 +62,8 @@ function Core:ini()
     self.inied = true
     if not isClient() then
         Core.data = ModData.getOrCreate(self.name)
-        Core.getSavedData()
-        Core.buildLookup()
+        Core:getSavedData()
+        Core:buildLookup()
         -- self:cacheLookups()
     end
     triggerEvent(self.events.OnReady, self)

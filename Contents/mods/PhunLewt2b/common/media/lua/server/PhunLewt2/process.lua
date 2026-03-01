@@ -71,15 +71,15 @@ local function resolveInheritance(data)
     return resolved
 end
 
-function Core.buildLookup()
+function Core:buildLookup()
 
     local resolvedConfigs = resolveInheritance(Core.data or {})
     Core.resolvedData = resolvedConfigs
-    Core.debug("PhunLewt.buildLookup", "Resolved Configs:", resolvedConfigs)
+    Core.debug("PhunLewt:buildLookup", "Resolved Configs:", resolvedConfigs)
 
 end
 
-function Core.getSavedData()
+function Core:getSavedData()
 
     -- cache categories for all items
     Core.getCategoryLookup()
@@ -200,7 +200,7 @@ function Core.getSavedData()
     for k, v in pairs(data) do
         v.name = k
     end
-    Core.buildLookup()
+    Core:buildLookup()
     Core.data = data
     Core.debug("PhunLewt:getSavedData", data, "--------")
     return data

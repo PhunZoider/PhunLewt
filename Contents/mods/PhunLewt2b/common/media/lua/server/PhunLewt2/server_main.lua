@@ -153,15 +153,15 @@ function Core.removeItemsFromContainer(container, isZed)
     end
 end
 
-function Core.setZoneData(data)
+function Core:setZoneData(data)
 
-    local fileData = Core.getSavedData()
+    local fileData = Core:getSavedData()
     fileData[data.name] = data
-    Core.saveChanges(fileData)
+    Core:saveChanges(fileData)
 
 end
 
-function Core.saveChanges(data)
+function Core:saveChanges(data)
 
     Core.data = data
     ModData.add(Core.name, data)
@@ -172,5 +172,5 @@ function Core.saveChanges(data)
         groups = Core.groups or {},
         data = data
     })
-    Core.buildLookup()
+    Core:buildLookup()
 end

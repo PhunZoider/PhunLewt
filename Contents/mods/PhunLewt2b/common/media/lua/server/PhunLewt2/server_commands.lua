@@ -9,6 +9,14 @@ local function isAuthorized(player)
     if not player then
         return false
     end
+    if Core.isLocal then
+        if isAdmin() then
+            return true
+        end
+        if isDebugEnabled() then
+            return true
+        end
+    end
     local level = player:getAccessLevel()
     return level == "admin" or level == "moderator"
 end
@@ -31,7 +39,7 @@ end
 Commands[Core.commands.requestData] = function(player, args)
     -- requesting zone from the editor, reload to support lua editing 
     args = args or {}
-    Core.getSavedData()
+    local dataset = Core:getSavedData()
 
     local names = {}
     for k, v in pairs(Core.data) do
@@ -67,7 +75,7 @@ end
 
 Commands[Core.commands.requestNames] = function(player, args)
     args = args or {}
-    Core.getSavedData()
+    Core:getSavedData()
     if args then
         local results = {
             username = player:getUsername(),
@@ -88,7 +96,7 @@ end
 
 Commands[Core.commands.requestConfigNames] = function(player, args)
     args = args or {}
-    Core.getSavedData()
+    Core:getSavedData()
     if args then
         local results = {
             username = player:getUsername(),
