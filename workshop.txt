@@ -41,6 +41,8 @@ description=[tr][td][b]On Empty Add Item[/b][/td][td]If a restocked container en
 description=[tr][td][b]Inherit[/b][/td][td]Inherit values from another configuration (and its parents). Usually, you’ll want to inherit from your Global Default config.[/td][/tr]
 description=[/table]
 description=
+description=[img]https://i.ibb.co/DZ7Vffn/Thumbs-Up.png[/img]
+description=
 description=[h2]More Phun Stuff[/h2]
 description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3674596146][img]https://i.ibb.co/3mQpB8ST/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3674596402][img]https://i.ibb.co/d4y0BhnF/preview.png[/img][/url]
 description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3623897097][img]https://i.ibb.co/mCv5kDgy/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3674595589][img]https://i.ibb.co/fYNn5BLC/preview.png[/img][/url]
