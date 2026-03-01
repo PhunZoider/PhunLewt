@@ -210,11 +210,13 @@ function UI:createChildren()
     local names = Core.configNames or {}
     self.controls.inherits:addOption("")
     local selected = 1
+    local optionIndex = 1
     for i = 1, #names do
         if names[i] ~= self.data.name then
+            optionIndex = optionIndex + 1
             self.controls.inherits:addOption(names[i])
             if self.data.inherit and names[i] == self.data.inherit then
-                selected = i + 1
+                selected = optionIndex
             end
         end
     end
