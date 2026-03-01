@@ -1,8 +1,6 @@
 version=1
+id=3676250472
 title=PhunLewt 2.1
-visibility=public
-description=⚠️ DEV BRANCH — Preview build for testing and feedback. This version may change frequently and could break between updates.
-description=
 description=Fine tune loot spawns and respawns by area and time by reducing their chance of spawn
 description=
 description=[h1]Setup[/h1]
@@ -32,6 +30,8 @@ description=[/list]
 description=
 description=[h1]Configuration Settings[/h1]
 description=
+description=[img][/img]
+description=
 description=[table]
 description=[tr][th]Setting[/th][th]Description[/th][/tr]
 description=[tr][td][b]Name[/b][/td][td]Unique name for this configuration.[/td][/tr]
@@ -45,6 +45,7 @@ description=[h2]More Phun Stuff[/h2]
 description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3674596146][img]https://i.ibb.co/3mQpB8ST/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3674596402][img]https://i.ibb.co/d4y0BhnF/preview.png[/img][/url]
 description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3623897097][img]https://i.ibb.co/mCv5kDgy/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3674595589][img]https://i.ibb.co/fYNn5BLC/preview.png[/img][/url]
 description=
-description=Coded with love for our awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community.  
+description=Coded with love for our awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community.
 description=Check out the [url=https://github.com/PhunZoider/PhunLewt]GitHub repo[/url] for more info.
 tags=Build 42;Multiplayer
+visibility=public
