@@ -4,18 +4,6 @@ end
 require "PhunLewt2/core"
 local Core = PhunLewt
 
--- Deep copy helper
-local function deepcopy(orig)
-    if type(orig) ~= "table" then
-        return orig
-    end
-    local copy = {}
-    for k, v in pairs(orig) do
-        copy[k] = deepcopy(v)
-    end
-    return copy
-end
-
 -- Recursive inheritance resolver
 local function resolveInheritance(data)
     local resolved = {}
@@ -38,7 +26,7 @@ local function resolveInheritance(data)
         if entry.inherit then
             local parent = resolveEntry(entry.inherit)
             if parent then
-                result = deepcopy(parent)
+                result = Core.tools.deepCopy(parent)
                 for _, groupName in ipairs(result.groups or {}) do
                     grouphash[groupName] = true
                 end
@@ -49,7 +37,8 @@ local function resolveInheritance(data)
 
         for k, v in pairs(entry) do
             if k ~= "inherit" then
-                if k == "categories" or k == "items" and type(v) == "table" then
+                if (k == "categories" or k == "items") and type(v) == "table" then
+
                     if not result[k] then
                         result[k] = {}
                     end
@@ -82,35 +71,35 @@ local function resolveInheritance(data)
     return resolved
 end
 
-function Core:buildLookup()
+function Core.buildLookup()
 
-    local resolvedConfigs = resolveInheritance(self.data or {})
+    local resolvedConfigs = resolveInheritance(Core.data or {})
     Core.resolvedData = resolvedConfigs
-    Core.debug("PhunLewt:buildLookup", "Resolved Configs:", resolvedConfigs)
+    Core.debug("PhunLewt.buildLookup", "Resolved Configs:", resolvedConfigs)
 
 end
 
-function Core:getSavedData()
+function Core.getSavedData()
 
     -- cache categories for all items
-    self:getCategoryLookup()
+    Core.getCategoryLookup()
 
     -- load Lua/PhunLewt.lua data into ModData
     local data = {}
-    local d = Core.tools.loadTable(self.consts.luaDataFileName)
+    local d = Core.tools.loadTable(Core.consts.luaDataFileName)
     if d == nil then
-        print("PhunLewt: missing ./lua/" .. self.consts.luaDataFileName ..
+        print("PhunLewt: missing ./lua/" .. Core.consts.luaDataFileName ..
                   ", this is normal if you haven't modified any zones")
-        ModData.add(self.name, {})
+        ModData.add(Core.name, {})
     elseif d.data then
 
         -- is this a legacy format?
         if d.groups then
             -- no, its current
-            self.groups = d.groups
+            Core.groups = d.groups
         else
             -- yes, its old format. Do we need to do anything spesh?
-            self.groups = {}
+            Core.groups = {}
             -- in the old format, struct was:
 
             -- Louisville = {
@@ -177,7 +166,7 @@ function Core:getSavedData()
                         local newGroup = groupData
                         newGroup.name = newGroupName
                         newGroup.groups = newGroup.groups or {}
-                        if newGroupName.extend == false then
+                        if newGroup.extend == false then
                             -- do nothing, no inheritance
                         else
                             if groupName == "main" then
@@ -193,25 +182,25 @@ function Core:getSavedData()
                 end
             end
             -- re-save
-            Core.tools.saveTable(self.consts.luaDataFileName, newStruct)
-            print("PhunLewt: converted legacy ./lua/" .. self.consts.luaDataFileName .. " to new format")
+            Core.tools.saveTable(Core.consts.luaDataFileName, newStruct)
+            print("PhunLewt: converted legacy ./lua/" .. Core.consts.luaDataFileName .. " to new format")
             d = newStruct
         end
-        ModData.add(self.name, d.data or {})
-        print("PhunLewt: loaded customisations from ./lua/" .. self.consts.luaDataFileName)
+        ModData.add(Core.name, d.data or {})
+        print("PhunLewt: loaded customisations from ./lua/" .. Core.consts.luaDataFileName)
     elseif d.data == nil then
-        print("PhunLewt: Unexpected format of ./lua/" .. self.consts.luaDataFileName .. ", cannot load data")
-        ModData.add(self.name, {})
+        print("PhunLewt: Unexpected format of ./lua/" .. Core.consts.luaDataFileName .. ", cannot load data")
+        ModData.add(Core.name, {})
     end
-    data = ModData.get(self.name)
+    data = ModData.get(Core.name)
     if data == nil then
         data = {}
-        ModData.add(self.name, data)
+        ModData.add(Core.name, data)
     end
     for k, v in pairs(data) do
         v.name = k
     end
-    self:buildLookup()
+    Core.buildLookup()
     Core.data = data
     Core.debug("PhunLewt:getSavedData", data, "--------")
     return data

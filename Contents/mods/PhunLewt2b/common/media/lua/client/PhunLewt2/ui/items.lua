@@ -129,13 +129,8 @@ function UI:createChildren()
     --         table.insert(categories, item.category)
     --     end
     -- end
-    local lookup = Core:getCategoryLookup()
-    -- for _, item in ipairs(self.data.categories) do
-    --     if not catMap[item.label] then
-    --         catMap[item.label] = true
-    --         table.insert(categories, item.label)
-    --     end
-    -- end
+    local lookup = Core.getCategoryLookup()
+
     for _, item in pairs(lookup) do
         if not catMap[item] then
             catMap[item] = true
@@ -277,8 +272,7 @@ function UI:refreshData()
         merged[k] = v
     end
 
-    -- local categories = Core:getCategoryLookup(true)
-    local categories = Core:getCategoryLookup()
+    local categories = Core.getCategoryLookup()
 
     local showAll = self.controls.showAll.selected[1]
     local filter = self.controls.filter:getInternalText():lower()
@@ -301,7 +295,7 @@ end
 function UI:doTooltip(item, col, row)
     local tooltip = self.tooltip
     local tooltip2 = self.tooltip2
-    local categories = Core:getCategoryLookup()
+    local categories = Core.getCategoryLookup()
 
     if col == nil then
         if tooltip2:isVisible() then

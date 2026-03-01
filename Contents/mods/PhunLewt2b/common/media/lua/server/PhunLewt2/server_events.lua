@@ -7,7 +7,7 @@ local Core = PhunLewt
 
 Events.OnFillContainer.Add(function(roomtype, containertype, container)
     Core.debugLn("OnFillContainer", roomtype, containertype, container)
-    Core:removeItemsFromContainer(container)
+    Core.removeItemsFromContainer(container)
 end);
 
 Events.OnClientCommand.Add(function(module, command, playerObj, arguments)

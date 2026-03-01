@@ -131,8 +131,8 @@ function UI:doTooltip(item, col, row)
     local desc = ""
     local suffix = ""
     local adjustment = nil
-    local inheritValue = item.type and self.data.inherit[item.type] or nil
-    local itemValue = item.type and self.data.categories[item.type] or nil
+    local inheritValue = item.type and self.data.inherit[item.label] or nil
+    local itemValue = item.type and self.data.categories[item.label] or nil
 
     if inheritValue then
         if itemValue then

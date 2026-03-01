@@ -204,6 +204,15 @@ function tools.getAllItems(refresh)
     return tools.itemsAll
 end
 
+function tools.isAdmin(player, ignoreLocal)
+
+    if isAdmin() or getDebug() or (Core.isLocal and not ignoreLocal) then
+        return true
+    end
+    return (getAccessLevel and (getAccessLevel() == "moderator" or getAccessLevel() == "admin")) or false
+
+end
+
 -- ---------------------------------------------------------------------------
 -- SHALLOW COPY
 -- Returns a shallow copy of a table, optionally excluding specified keys.
@@ -410,7 +419,7 @@ function tools.loadTable(filename, createIfNotExists)
 
     local result, err = tableOfStringsToTable(lines)
     if err then
-        print("PhunZones file_utils: error loading '" .. filename .. "': " .. err)
+        print("PhunLewt file_utils: error loading '" .. filename .. "': " .. err)
         return nil
     end
 

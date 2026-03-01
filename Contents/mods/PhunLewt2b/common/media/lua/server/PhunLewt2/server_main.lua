@@ -7,14 +7,9 @@ local PZ = PhunZones
 local getGameTime = getGameTime
 local getSandboxOptions = getSandboxOptions
 
-function Core:getAdjustmentsForZone(region, zone)
-    Core.debug("PhunLewt: getAdjustmentsForZone", region, zone)
-    return self.zoneLookups[region .. zone] or self.zoneLookups[region .. "main"]
-end
+function Core.removeItemsFromContainer(container, isZed)
 
-function Core:removeItemsFromContainer(container, isZed)
-
-    local categoryLookup = self:getCategoryLookup()
+    local categoryLookup = Core.getCategoryLookup()
 
     local square = container:getSourceGrid()
     local defItem = nil
@@ -33,12 +28,16 @@ function Core:removeItemsFromContainer(container, isZed)
 
         if items and items:size() > 0 then
 
-            local z = PZ:getLocation(square)
-            local selfData = self.data
-
+            -- Resolve lewtkey from PhunZones if available
             local lewtkey = nil
-            local resolvedData = self.resolvedData
+            if PZ then
+                local z = PZ.getLocation(square)
+                if z and z.lewtkey and z.lewtkey ~= "" then
+                    lewtkey = z.lewtkey
+                end
+            end
 
+            -- Zed inventory: prevent duplicate processing on the same corpse
             if isZed or (container:getParent() and instanceof(container:getParent(), "IsoZombie")) or
                 container:getType() == "inventorymale" or container:getType() == "inventoryfemale" then
                 Core.debug("PhunLewt: checking zed loot for " .. tostring(container:getType()))
@@ -47,19 +46,6 @@ function Core:removeItemsFromContainer(container, isZed)
                     return
                 end
                 md.PhunLewtChecked = true
-                if z.zedlewtkey and z.zedlewtkey ~= "" then
-                    lewtkey = z.zedlewtkey
-                elseif z.zone ~= "main" and PZ.data[z.region] and PZ.data[z.region].main and
-                    PZ.data[z.region].main.lewtkey and PZ.data[z.region].main.zedlewtkey ~= "" then
-                    lewtkey = PZ.data[z.region].main.zedlewtkey
-                end
-            else
-                if z.lewtkey and z.lewtkey ~= "" then
-                    lewtkey = z.lewtkey
-                elseif z.zone ~= "main" and PZ.data[z.region] and PZ.data[z.region].main and
-                    PZ.data[z.region].main.lewtkey and PZ.data[z.region].main.lewtkey ~= "" then
-                    lewtkey = PZ.data[z.region].main.lewtkey
-                end
             end
 
             local lookup = {
@@ -167,121 +153,24 @@ function Core:removeItemsFromContainer(container, isZed)
     end
 end
 
-local function deepMerge(base, override)
-    local result = {}
-    for k, v in pairs(base) do
-        if type(v) == "table" then
-            result[k] = {}
-            for sk, sv in pairs(v) do
-                result[k][sk] = sv
-            end
-        else
-            result[k] = v
-        end
-    end
-    for k, v in pairs(override or {}) do
-        if type(v) == "table" then
-            result[k] = result[k] or {}
-            for sk, sv in pairs(v) do
-                result[k][sk] = sv
-            end
-        else
-            result[k] = v
-        end
-    end
-    return result
-end
+function Core.setZoneData(data)
 
-function Core:cacheLookups()
-
-    local default = self.data._default or {}
-
-    local results = {}
-    for k, v in pairs(self.data) do
-        if k ~= "_default" then
-            local regionData = self.data[k] or {}
-
-            if type(v) == "table" then
-                for zone, zoneData in pairs(v) do
-
-                    local key = k .. zone
-
-                    local main = zone ~= "main" and self.data[k].main or {}
-                    local subzone = self.data[k][zone] or {}
-
-                    if subzone.extend ~= false then
-                        subzone = deepMerge(main, subzone)
-                    end
-                    results[key] = subzone
-                end
-            end
-        end
-    end
-    self.zoneLookups = results
-end
-
-function Core:getZoneData(region, zone)
-    if not region or region == "_default" then
-        if not self.data._default then
-            self.data._default = {}
-        end
-        if not self.data._default.main then
-            self.data._default.main = {
-                categories = {},
-                items = {}
-            }
-        end
-        if not self.data._default.main.categories then
-            self.data._default.categories = {}
-        end
-        if not self.data._default.main.items then
-            self.data._default.main.items = {}
-        end
-        self.data._default.region = "_default"
-        self.data._default.zone = "main"
-        self.data._default.main.region = "_default"
-        self.data._default.main.zone = "main"
-        return self.data._default.main
-    end
-    if not self.data[region] then
-        self.data[region] = {}
-    end
-    if not self.data[region][zone] then
-        self.data[region][zone] = {
-            categories = {},
-            items = {}
-        }
-    end
-    if not self.data[region][zone].categories then
-        self.data[region][zone].categories = {}
-    end
-    if not self.data[region][zone].items then
-        self.data[region][zone].items = {}
-    end
-    self.data[region][zone].region = region
-    self.data[region][zone].zone = zone
-    return self.data[region][zone]
-
-end
-
-function Core:setZoneData(data)
-
-    local fileData = Core:getSavedData()
+    local fileData = Core.getSavedData()
     fileData[data.name] = data
-    self:saveChanges(fileData)
+    Core.saveChanges(fileData)
 
 end
 
-function Core:saveChanges(data)
+function Core.saveChanges(data)
 
-    self.data = data
-    ModData.add(self.name, data)
-    if self.settings.Debug then
+    Core.data = data
+    ModData.add(Core.name, data)
+    if Core.settings.Debug then
         Core.debug("PhunLewt: saving data to ModData", data)
     end
-    Core.tools.saveTable(self.consts.luaDataFileName, {
-        groups = self.groups or {},
+    Core.tools.saveTable(Core.consts.luaDataFileName, {
+        groups = Core.groups or {},
         data = data
     })
-    Core:buildLookup()
+    Core.buildLookup()
 end

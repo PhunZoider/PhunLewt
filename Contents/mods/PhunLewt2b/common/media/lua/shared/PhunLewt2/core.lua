@@ -22,6 +22,7 @@ PhunLewt = {
         onReady = "PhunLewtOnReady",
         OnReceiveInheritance = "PhunLewtOnReceiveInheritance"
     },
+    tools = require "PhunLewt2/tools",
     settings = {},
     ui = {}
 }
@@ -61,16 +62,16 @@ function Core:ini()
     self.inied = true
     if not isClient() then
         Core.data = ModData.getOrCreate(self.name)
-        Core:getSavedData()
-        Core:buildLookup()
+        Core.getSavedData()
+        Core.buildLookup()
         -- self:cacheLookups()
     end
     triggerEvent(self.events.OnReady, self)
 end
 
-function Core:getCategoryLookup(refresh)
-    if not refresh and self.itemCategoryLookup then
-        return self.itemCategoryLookup
+function Core.getCategoryLookup(refresh)
+    if not refresh and Core.itemCategoryLookup then
+        return Core.itemCategoryLookup
     end
     local results = {}
     local itemList = getScriptManager():getAllItems()
@@ -81,6 +82,6 @@ function Core:getCategoryLookup(refresh)
             results[item:getFullName()] = cat
         end
     end
-    self.itemCategoryLookup = results
+    Core.itemCategoryLookup = results
     return results
 end

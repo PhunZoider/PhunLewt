@@ -3,7 +3,7 @@ if isServer() then
 end
 local tools = require "PhunLewt2/ui/tools"
 local Core = PhunLewt
-local profileName = "PhunLewtCongfigs"
+local profileName = "PhunLewtConfigs"
 
 Core.ui.configs = ISCollapsableWindowJoypad:derive(profileName);
 local UI = Core.ui.configs
@@ -74,11 +74,6 @@ end
 
 function UI:RestoreLayout(name, layout)
 
-    -- ISLayoutManager.DefaultRestoreWindow(self, layout)
-    -- if name == profileName then
-    --     ISLayoutManager.DefaultRestoreWindow(self, layout)
-    --     self.userPosition = layout.userPosition == 'true'
-    -- end
     self:recalcSize();
 end
 
@@ -111,15 +106,6 @@ function UI:createChildren()
     local h = self.height - rh - th
 
     self.controls = {}
-
-    -- self.controls.ok = ISButton:new(padding, self.height - rh - padding - tools.FONT_HGT_SMALL, 80,
-    --     tools.FONT_HGT_SMALL + 4, getText("OK"), self, UI.onOK);
-    -- self.controls.ok:initialise();
-    -- self.controls.ok:instantiate();
-    -- if self.controls.ok.enableAcceptColor then
-    --     self.controls.ok:enableAcceptColor()
-    -- end
-    -- self:addChild(self.controls.ok);
 
     local panel = ISPanel:new(w - 110, y, 100, 300 - padding);
     panel.drawBorder = false
@@ -218,7 +204,7 @@ function UI:onDelete()
         local modal = ISModalDialog:new(getCore():getScreenWidth() / 2 - w / 2, getCore():getScreenHeight() / 2 - h / 2,
             w, h, getText("IGUI_PhunLewt_Confirm_Remove", item), true, self, function(self, button)
                 if button.internal == "YES" then
-                    table.remove(self.data, list.selected + 1)
+                    table.remove(self.data, list.selected)
                     sendClientCommand(Core.name, Core.commands.delete, {
                         name = item
                     })
@@ -315,36 +301,12 @@ function UI:prerender()
 
     local padding = 10
     local ok = self.controls.new
-    -- ok:setX(ok.parent.width - ok.width - padding)
-    -- ok:setY(ok.parent.height - ok.height - self:resizeWidgetHeight() - 10)
 
-    -- self.controls.new:setY(ok.y)
-    -- self.controls.new:setX(self.controls.ok.x - self.controls.new.width - padding)
-    -- self.controls.delete:setY(ok.y)
-    -- self.controls.delete:setX(self.controls.new.x - self.controls.delete.width - padding)
     self.controls.delete:setEnable(self.controls.list.selected > 0)
 
-    -- self.controls.edit:setY(ok.y)
-    -- self.controls.edit:setX(self.controls.delete.x - self.controls.edit.width - padding)
     self.controls.edit:setEnable(self.controls.list.selected > 0)
 
-    -- self.controls.copy:setY(ok.y)
-    -- self.controls.copy:setX(self.controls.edit.x - self.controls.copy.width - padding)
     self.controls.copy:setEnable(self.controls.list.selected > 0)
-    -- local filterPanel = self.controls.filtersPanel
-    -- filterPanel:setWidth(filterPanel.parent.width)
-    -- filterPanel:setY(ok.y - 100)
-
-    -- local lblFilterCategory = self.controls.lblFilterCategory
-
-    -- local filterCategory = self.controls.filterCategory
-    -- filterCategory:setX(filterCategory.parent.width - filterCategory.width - padding)
-    -- filterCategory:setY(lblFilterCategory.y + lblFilterCategory.height + padding)
-    -- lblFilterCategory:setX(filterCategory.x)
-
-    -- local filter = self.controls.filter
-    -- filter:setWidth(filterCategory.x - filter.x - padding)
-    -- filter:setY(lblFilterCategory.y + lblFilterCategory.height + padding)
 
     local panel = self.controls.panel
     panel:setX(self.width - panel.width - padding)
@@ -353,25 +315,7 @@ function UI:prerender()
 
     local list = self.controls.list
     local listw = panel.x - 20
-    -- list:setHeight(panel.height)
 
-end
-
-function UI:onOK()
-
-    local data = self.data
-    if self.controls.extend and self.controls.extend:isSelected(1) == false then
-        data.extend = false
-    else
-        data.extend = nil
-    end
-    data.hours = tonumber(self.controls.hours:getText()) or nil
-    data.onempty = self.controls.onempty:getText() or nil
-    data.name = data.name or (data.region .. "_" .. data.zone)
-    -- data.region = data.region or "_default"
-    -- data.zone = data.zone or "main"
-    -- sendClientCommand(Core.name, Core.commands.saveZoneData, data)
-    self:close()
 end
 
 function UI:drawDatas(y, item, alt)
@@ -397,36 +341,7 @@ function UI:drawDatas(y, item, alt)
     local iconSize = tools.FONT_HGT_SMALL;
     local xoffset = 10;
 
-    -- local clipX = self.columns[1].size
-    -- local clipX2 = self.columns[2].size
-    -- local clipX3 = self.columns[3].size
-    -- local clipY = math.max(0, y + self:getYScroll())
-    -- local clipY2 = math.min(self.height, y + self:getYScroll() + self.itemheight) - 1
-
-    -- if item.item.texture then
-    --     local textured = self:drawTextureScaledAspect2(item.item.texture, xoffset, y, self.itemheight - 4,
-    --         self.itemheight - 4, 1, 1, 1, 1)
-    --     xoffset = xoffset + self.itemheight + 4
-    -- end
-
-    -- self:setStencilRect(clipX, clipY, clipX2 - clipX, clipY2 - clipY)
     self:drawText(item.text, xoffset, y + 4, 1, 1, 1, a, self.font);
-    -- self:clearStencilRect()
-
-    -- local value = item.item.category or ""
-    -- local cw = self.columns[2].size
-    -- self:setStencilRect(clipX2, clipY, clipX3 - clipX2, clipY2 - clipY)
-    -- self:drawText(value, cw + 4, y + 4, 1, 1, 1, a, self.font);
-    -- self:clearStencilRect()
-
-    -- local value = ""
-    -- if item.item.chance then
-    --     value = "-" .. tostring(item.item.chance) .. "%"
-    -- end
-    -- local cw = self.columns[3].size
-    -- self:setStencilRect(clipX3, clipY, self:getWidth() - clipX3 - self.vscroll.width, clipY2 - clipY)
-    -- self:drawText(value, cw + 4, y + 4, 1, 1, 1, a, self.font);
-    -- self:clearStencilRect()
 
     self.itemsHeight = y + self.itemheight;
     return self.itemsHeight;

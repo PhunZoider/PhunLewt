@@ -16,7 +16,7 @@ end
 
 function Core.editConfigs(player, data)
     Core.ui.configs.open(player, data, function(zone)
-        local s = self
+
     end)
 end
 

@@ -3,7 +3,6 @@ if isServer() then
 end
 local tools = require "PhunLewt2/ui/tools"
 local Core = PhunLewt
-local PZ = PhunZones
 local profileName = "PhunLewtEditor"
 
 Core.ui.editor = ISCollapsableWindowJoypad:derive(profileName);
@@ -31,14 +30,6 @@ function UI.open(player, data)
     instance:ensureVisible()
     instance:refreshItems()
     instance:setAlwaysOnTop(true)
-
-    -- local function receiveInheritance(inheritData)
-    --     print("PhunLewt: Received inheritance data")
-    --     instance.inherit = inheritData or {}
-    --     instance:refreshItems()
-    -- end
-
-    -- Events[Core.events.OnReceiveInheritance].Add(instance.recieveInheritance)
 
     return instance;
 end
@@ -105,24 +96,12 @@ function UI:new(x, y, width, height, player, playerIndex, data)
     o.zOffsetSmallFont = 6;
     o:setWantKeyEvents(true)
     local title = "PhunLewt Editor"
-    local zones = PZ.data.lookup
-    if zones and zones[data.region] and zones[data.region][data.zone] then
-        title = zones[data.region][data.zone].title
-        if zones[data.region][data.zone].subtitle then
-            title = title .. " - " .. zones[data.region][data.zone].subtitle
-        end
-    end
     o:setTitle(title .. " lewt reducer")
     return o;
 end
 
 function UI:RestoreLayout(name, layout)
 
-    -- ISLayoutManager.DefaultRestoreWindow(self, layout)
-    -- if name == profileName then
-    --     ISLayoutManager.DefaultRestoreWindow(self, layout)
-    --     self.userPosition = layout.userPosition == 'true'
-    -- end
     self:recalcSize();
 end
 
@@ -166,21 +145,6 @@ function UI:createChildren()
     end
     self:addChild(self.controls.ok);
 
-    -- container for the inline filters below the list
-    -- local filtersPanel = ISPanel:new(0, self.controls.ok.y - 100, self.width, 80);
-    -- filtersPanel.drawBorder = false
-    -- filtersPanel:initialise();
-    -- filtersPanel:instantiate();
-    -- filtersPanel.backgroundColor = {
-    --     r = 0.1,
-    --     g = 0.1,
-    --     b = 0.1,
-    --     a = 0.8
-    -- }
-
-    -- self.controls.filtersPanel = filtersPanel
-    -- self:addChild(filtersPanel);
-
     y = y + padding
 
     local lbl = tools.getLabel(getText("IGUI_PhunLewt_Name"), padding, y)
@@ -196,8 +160,8 @@ function UI:createChildren()
     lbl = tools.getLabel(getText("IGUI_PhunLewt_Default"), padding, y)
     txt = tools.getTextbox(tostring(self.data.default or ""), getText("IGUI_PhunLewt_Default_Tooltip"),
         self.width - 200 - padding, y, 200);
-    self.controls.lblName = lbl
-    self.controls.name = txt
+    self.controls.lblDefault = lbl
+    self.controls.default = txt
     self:addChild(lbl);
     self:addChild(txt)
 
@@ -223,30 +187,6 @@ function UI:createChildren()
 
     y = y + lbl.height + padding
 
-    -- local selectorTitle = ISLabel:new(padding, y, tools.FONT_HGT_SMALL, getText("IGUI_PhunLewt_Edit_Item_Selection"), 1,
-    --     1, 1, 1, UIFont.Small, true);
-    -- selectorTitle:initialise();
-    -- selectorTitle:instantiate();
-    -- self:addChild(selectorTitle);
-
-    -- local selector = ISButton:new(self.width - 200 - padding, y, 200, tools.BUTTON_HGT, " ... ", self, function()
-    --     local existing = PL.table.deepCopy(self.data)
-    --     Core.ui.filters.open(self.player, existing, function(data)
-    --         local s = self
-    --         s.data.categories = data.categories or {}
-    --         s.data.items = data.items or {}
-    --         s:refreshItems()
-    --     end)
-    -- end);
-    -- selector:initialise();
-    -- selector:instantiate();
-    -- selector:setAnchorRight(true);
-    -- selector:setAnchorLeft(true);
-    -- self:addChild(selector);
-    -- self.controls.selector = selector
-
-    -- y = y + padding + selector.height
-
     local inheritsTitle = ISLabel:new(padding, y, tools.FONT_HGT_SMALL, getText("IGUI_PhunLewt_InheritFrom"), 1, 1, 1,
         1, UIFont.Small, true);
     inheritsTitle:initialise();
@@ -258,10 +198,6 @@ function UI:createChildren()
                         self.controls.inherits.options[self.controls.inherits.selected] or nil
         if key then
             self:requestInheritance(key)
-            -- sendClientCommand(Core.name, Core.commands.requestInheritance, {
-            --     username = self.player:getUsername(),
-            --     key = key
-            -- })
         else
             self.inherit = {}
             self:refreshItems()
@@ -307,70 +243,6 @@ function UI:createChildren()
     self.controls.tabPanel:addView(getText("IGUI_PhunLewt_Items"), self.controls.items)
     self.controls.tabPanel:addView(getText("IGUI_PhunLewt_Categories"), self.controls.categories)
 
-    -- if self.data.region ~= "_default" then
-    --     local chkExtend = ISTickBox:new(self.width - 200 - padding, y, tools.BUTTON_HGT, tools.BUTTON_HGT,
-    --         getText("IGUI_PhunZones_AllZones"), self)
-    --     chkExtend:addOption(getText("IGUI_PhunLewt_Extend_Default"), nil)
-    --     chkExtend:setWidthToFit()
-    --     chkExtend:setSelected(1, self.data.extend ~= false)
-    --     chkExtend.onMouseUp = function(s, x, y)
-    --         ISTickBox.onMouseUp(s, x, y)
-    --         return true
-    --     end
-    --     chkExtend.tooltip = getText("IGUI_PhunLewt_Extend_Default_tooltip")
-    --     self:addChild(chkExtend)
-    --     self.controls.extend = chkExtend
-
-    --     y = y + chkExtend.height + padding
-    -- end
-
-    -- local list = tools.getListbox(x + padding, y, w - (padding * 2), filtersPanel.y - y - padding - tools.HEADER_HGT,
-    --     {getText("Item"), {getText("IGUI_PhunLewt_Category_Header"), w - 150},
-    --      {getText("IGUI_PhunLewt_Reduction_Percent"), w - 50}}, {
-    --         draw = self.drawDatas,
-    --         click = self.click,
-    --         rightClick = self.rightClick,
-    --         doubleClick = self.doubleClick
-    --     });
-
-    -- self:addChild(list);
-    -- self.controls.list = list
-
-    -- y = padding + filtersPanel.y
-    -- y = 0
-    -- local lblFilter = tools.getLabel(getText("IGUI_PhunLewt_Filter"), padding, padding)
-    -- self.controls.lblFilter = lblFilter
-    -- filtersPanel:addChild(lblFilter)
-
-    -- local filter = ISTextEntryBox:new("", padding, y + lblFilter.height + padding, self.width - 200, tools.BUTTON_HGT);
-    -- filter.onTextChange = function()
-    --     self:refreshItems()
-    -- end
-    -- self.controls.filter = filter
-    -- filter:initialise();
-    -- filter:instantiate();
-    -- filter:setAnchorRight(true)
-    -- filtersPanel:addChild(filter);
-
-    -- local left = filter.x + filter.width + padding
-    -- local lblFilterCategory = tools.getLabel(getText("IGUI_PhunLewt_Category_Header"), self.width - x - left,
-    --     lblFilter.y)
-    -- filtersPanel:addChild(lblFilterCategory)
-    -- self.controls.lblFilterCategory = lblFilterCategory
-    -- local filterCategory = ISComboBox:new(left, y + lblFilterCategory.height + padding, self.width - padding - left,
-    --     tools.FONT_HGT_MEDIUM, self, function()
-    --         self:refreshItems()
-    --     end);
-    -- filterCategory:initialise();
-    -- filterCategory:instantiate();
-
-    -- self.controls.filterCategory = filterCategory
-    -- filtersPanel:addChild(filterCategory);
-    -- filterCategory:addOption("")
-    -- for _, category in ipairs(PL.getAllItemCategories()) do
-    --     filterCategory:addOption(category.label)
-    -- end
-
 end
 
 function UI:isKeyConsumed(key)
@@ -399,28 +271,6 @@ function UI:prerender()
     categories:setWidth(categories.parent.width)
     categories:setHeight(categories.parent.height - self.controls.tabPanel.tabHeight)
 
-    -- local filterPanel = self.controls.filtersPanel
-    -- filterPanel:setWidth(filterPanel.parent.width)
-    -- filterPanel:setY(ok.y - 100)
-
-    -- local lblFilterCategory = self.controls.lblFilterCategory
-
-    -- local filterCategory = self.controls.filterCategory
-    -- filterCategory:setX(filterCategory.parent.width - filterCategory.width - padding)
-    -- filterCategory:setY(lblFilterCategory.y + lblFilterCategory.height + padding)
-    -- lblFilterCategory:setX(filterCategory.x)
-
-    -- local filter = self.controls.filter
-    -- filter:setWidth(filterCategory.x - filter.x - padding)
-    -- filter:setY(lblFilterCategory.y + lblFilterCategory.height + padding)
-
-    -- local list = self.controls.list
-    -- local listw = list.width - 20
-    -- local chanceW = 50
-    -- local categoryW = 150
-    -- local itemW = listw - chanceW - categoryW
-    -- list.columns[2].size = itemW
-    -- list.columns[3].size = itemW + categoryW
 end
 
 function UI:onOK()
@@ -430,14 +280,12 @@ function UI:onOK()
     data.inherit = self.controls.inherits.selected > 0 and
                        self.controls.inherits.options[self.controls.inherits.selected] or nil
     data.hours = tonumber(self.controls.hours:getText()) or nil
-    data.default = tonumber(self.controls.name:getText()) or nil
+    data.default = tonumber(self.controls.default:getText()) or nil
     data.onempty = self.controls.onempty:getText() or nil
-    data.name = data.name or (data.region .. "_" .. data.zone)
+
     data.items = self.controls.items.data.items
     data.categories = self.controls.categories.data.categories
 
-    -- data.region = data.region or "_default"
-    -- data.zone = data.zone or "main"
     sendClientCommand(Core.name, Core.commands.saveZoneData, data)
     self:close()
 end
@@ -450,41 +298,6 @@ function UI:refreshItems()
     self.controls.categories.data.categories = self.data.categories or {}
     self.controls.categories.data.inherit = (self.inherit or {}).categories or {}
     self.controls.categories:refreshData()
-    -- self.controls.list:clear();
-    -- self.lastSelected = nil
-
-    -- local filterText = self.controls.filter:getInternalText():lower()
-    -- local filterCategory = self.controls.filterCategory.options[self.controls.filterCategory.selected]
-    -- local filters = self.data or {}
-    -- local results = {}
-
-    -- local allItems = PL.getAllItems()
-    -- for _, v in ipairs(allItems) do
-    --     if (filters.items and filters.items[v.type]) or (filters.categories and filters.categories[v.category]) then
-    --         table.insert(results, {
-    --             type = v.type,
-    --             label = v.label,
-    --             category = v.category,
-    --             texture = v.texture,
-    --             chance = filters.items[v.type] or filters.categories[v.category]
-    --         })
-    --     end
-
-    -- end
-
-    -- table.sort(results, function(a, b)
-    --     return a.label:lower() < b.label:lower()
-    -- end)
-
-    -- self.itemlist = results
-    -- self.controls.list:clear()
-    -- for _, v in ipairs(results) do
-    --     if filterCategory == "" or v.category == filterCategory then
-    --         if (filterText == "" or string.match(v.label:lower(), filterText)) then
-    --             self.controls.list:addItem(v.label, v);
-    --         end
-    --     end
-    -- end
 
 end
 

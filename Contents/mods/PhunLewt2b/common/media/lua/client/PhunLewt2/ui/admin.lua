@@ -6,7 +6,7 @@ require "DebugUIs/DebugMenu/ISDebugMenu"
 local Core = PhunLewt
 
 local function showPhunLewtConfigs()
-    if PL.isAdmin(getPlayer()) then
+    if Core.tools.isAdmin(getPlayer()) then
         Core.showLoadingModal()
         sendClientCommand(Core.name, Core.commands.requestNames, {})
     end
