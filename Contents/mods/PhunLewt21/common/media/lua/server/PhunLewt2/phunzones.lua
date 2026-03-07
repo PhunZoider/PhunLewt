@@ -4,8 +4,8 @@ local Core = PhunLewt
 local activeMods = getActivatedMods()
 
 if activeMods:contains("\\phunzones2") or activeMods:contains("\\phunzones2test") then
-    local PZ = PhunZones
     require "PhunZones/core"
+    local PZ = PhunZones
 
     Core.debugLn("PhunZones2 detected, adding zone fields for PhunLewt")
 
