@@ -3,11 +3,11 @@ local Core = PhunLewt
 
 local activeMods = getActivatedMods()
 
-if activeMods:contains("\\phunzones2") or activeMods:contains("\\phunzones2test") then
+if activeMods:contains("phunzones2") or activeMods:contains("phunzones2test") then
     require "PhunZones/core"
     local PZ = PhunZones
 
-    Core.debugLn("PhunZones2 detected, adding zone fields for PhunLewt")
+    print("[PhunLewt] PhunZones2 detected, adding zone fields for PhunLewt")
 
     PZ.fields.lewtkey = {
         label = "IGUI_PhunLewt_LewtConfig",
@@ -34,6 +34,6 @@ if activeMods:contains("\\phunzones2") or activeMods:contains("\\phunzones2test"
     }
 
 else
-    Core.debugLn("PhunZones2 not detected, using default zone data for PhunLewt")
+    print("[PhunLewt] PhunZones2 not detected, using default zone data for PhunLewt")
 end
 
