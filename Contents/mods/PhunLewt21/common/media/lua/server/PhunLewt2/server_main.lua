@@ -38,8 +38,8 @@ function Core.removeItemsFromContainer(container, isZed)
             end
 
             -- Zed inventory: prevent duplicate processing on the same corpse
-            if isZed or (container:getParent() and instanceof(container:getParent(), "IsoZombie")) or
-                container:getType() == "inventorymale" or container:getType() == "inventoryfemale" then
+            local isDeadBody = parent and (instanceof(parent, "IsoDeadBody") or instanceof(parent, "IsoZombie"))
+            if isZed or isDeadBody or container:getType() == "inventorymale" or container:getType() == "inventoryfemale" then
                 Core.debug("PhunLewt: checking zed loot for " .. tostring(container:getType()))
                 local md = container:getParent():getModData()
                 if md.PhunLewtChecked then
@@ -48,9 +48,10 @@ function Core.removeItemsFromContainer(container, isZed)
                 md.PhunLewtChecked = true
             end
 
-            local lookup = Core.resolvedData[lewtkey]
-                or Core.resolvedData[Core.consts.defaultConfigKey]
-                or { items = {}, categories = {} }
+            local lookup = Core.resolvedData[lewtkey] or Core.resolvedData[Core.consts.defaultConfigKey] or {
+                items = {},
+                categories = {}
+            }
 
             local defaultReduction = lookup.default or 0
 
@@ -104,6 +105,9 @@ function Core.removeItemsFromContainer(container, isZed)
 
                         if rand < (chance * adjustment) then
                             container:Remove(item)
+                            if isDeadBody then
+                                sendRemoveItemFromContainer(container, item)
+                            end
                             removed = removed + 1
                         end
                     elseif doDebug then
