@@ -7,6 +7,11 @@ local PZ = PhunZones
 local getGameTime = getGameTime
 local getSandboxOptions = getSandboxOptions
 
+function Core.removeItemsFromZed(container)
+
+    return Core.removeItemsFromContainer(container, true)
+end
+
 function Core.removeItemsFromContainer(container, isZed)
 
     local categoryLookup = Core.getCategoryLookup()
