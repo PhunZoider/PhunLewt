@@ -1,4 +1,4 @@
-require "PhunLewt2/client_main"
+require "PhunLewt2/core"
 local Core = PhunLewt
 
 Events[Core.events.OnReady].Add(function()
