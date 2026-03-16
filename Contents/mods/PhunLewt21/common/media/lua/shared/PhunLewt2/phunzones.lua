@@ -18,6 +18,8 @@ Events[Core.events.OnReady].Add(function()
             initialize = function()
                 sendClientCommand(Core.name, Core.commands.requestConfigNames, {})
             end,
+            group = "PhunLewt",
+            order = 101,
             getOptions = function()
                 local options = {{
                     label = " ",
@@ -40,6 +42,8 @@ Events[Core.events.OnReady].Add(function()
                 label = "IGUI_PhunLewt_ZedLewtConfig",
                 type = "combo",
                 tooltip = "IGUI_PhunLewt_ZedLewtConfig_tooltip",
+                group = "PhunLewt",
+                order = 201,
                 initialize = function()
                     sendClientCommand(Core.name, Core.commands.requestConfigNames, {})
                 end,

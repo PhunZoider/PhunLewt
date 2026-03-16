@@ -12,6 +12,8 @@ function Core.removeItemsFromZed(container)
     return Core.removeItemsFromContainer(container, true)
 end
 
+local separateZedConfig = nil
+
 function Core.removeItemsFromContainer(container, isZed)
 
     local categoryLookup = Core.getCategoryLookup()
@@ -33,19 +35,26 @@ function Core.removeItemsFromContainer(container, isZed)
 
         if items and items:size() > 0 then
 
+            local isDeadBody = parent and (instanceof(parent, "IsoDeadBody") or instanceof(parent, "IsoZombie"))
+            local zed = isZed or isDeadBody or container:getType() == "inventorymale" or container:getType() ==
+                            "inventoryfemale"
+
             -- Resolve lewtkey from PhunZones if available
             local lewtkey = nil
             if PZ then
                 local z = PZ.getLocation(square)
-                if z and z.lewtkey and z.lewtkey ~= "" then
+                if separateZedConfig == nil then
+                    separateZedConfig = Core.getOption("SeparateZedConfig", false)
+                end
+                if separateZedConfig and z and z.zlewtkey and z.zlewtkey ~= "" then
+                    lewtkey = z.zlewtkey
+                elseif z and z.lewtkey and z.lewtkey ~= "" then
                     lewtkey = z.lewtkey
                 end
             end
 
             -- Zed inventory: prevent duplicate processing on the same corpse
-            local isDeadBody = parent and (instanceof(parent, "IsoDeadBody") or instanceof(parent, "IsoZombie"))
-            if isZed or isDeadBody or container:getType() == "inventorymale" or container:getType() == "inventoryfemale" then
-                Core.debug("PhunLewt: checking zed loot for " .. tostring(container:getType()))
+            if zed then
                 local md = container:getParent():getModData()
                 if md.PhunLewtChecked then
                     return
