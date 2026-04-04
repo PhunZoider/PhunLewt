@@ -79,14 +79,15 @@ Commands[Core.commands.requestNames] = function(player, args)
     if args then
         local results = {
             username = player:getUsername(),
-            names = {}
+            names = {},
+            defaults = Core.defaults or {}
         }
         for k, v in pairs(Core.data) do
             table.insert(results.names, k)
         end
         if Core.isLocal then
             Core.configNames = results.names or {}
-            Core.editConfigs(player, results.names)
+            Core.editConfigs(player, results.names, results.defaults)
             Core.hideLoadingModal()
         else
             sendServerCommand(player, Core.name, Core.commands.requestNames, results)
@@ -119,6 +120,19 @@ Commands[Core.commands.saveZoneData] = function(player, args)
     end
     if args then
         Core.debug("PhunLewt:saveZoneData", args, "--------")
+        -- Handle rename: remove old key and update defaults
+        if args.oldName and args.oldName ~= args.name then
+            Core.data[args.oldName] = nil
+            local defaults = Core.defaults or {}
+            if defaults.containerConfig == args.oldName then
+                defaults.containerConfig = args.name
+            end
+            if defaults.zedConfig == args.oldName then
+                defaults.zedConfig = args.name
+            end
+            Core.defaults = defaults
+        end
+        args.oldName = nil
         Core:setZoneData(args)
     end
 end
@@ -142,6 +156,18 @@ Commands[Core.commands.copy] = function(player, args)
         Core.debug("PhunLewt:copy", args, "--------")
         Core.data[args.name .. "_copy"] = Core.tools.deepCopy(Core.data[args.name])
         Core.data[args.name .. "_copy"].name = args.name .. "_copy"
+        Core:saveChanges(Core.data)
+    end
+end
+
+Commands[Core.commands.saveDefaults] = function(player, args)
+    if not isAuthorized(player) then
+        return
+    end
+    if args then
+        Core.defaults = Core.defaults or {}
+        Core.defaults.containerConfig = args.containerConfig
+        Core.defaults.zedConfig = args.zedConfig
         Core:saveChanges(Core.data)
     end
 end

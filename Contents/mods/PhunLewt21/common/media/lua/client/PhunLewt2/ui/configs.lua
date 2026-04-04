@@ -9,17 +9,17 @@ Core.ui.configs = ISCollapsableWindowJoypad:derive(profileName);
 local UI = Core.ui.configs
 local instances = {}
 
-function UI.open(player, data)
+function UI.open(player, data, defaults)
 
     local playerIndex = player:getPlayerNum()
     local core = getCore()
-    local width = 600 * tools.FONT_SCALE
-    local height = 300 * tools.FONT_SCALE
+    local width = 450 * tools.FONT_SCALE
+    local height = 350 * tools.FONT_SCALE
 
     local x = (core:getScreenWidth() - width) / 2
     local y = (core:getScreenHeight() - height) / 2
 
-    local instance = UI:new(x, y, width, height, player, playerIndex, Core.tools.deepCopy(data));
+    local instance = UI:new(x, y, width, height, player, playerIndex, Core.tools.deepCopy(data), defaults or {});
 
     instance:initialise();
 
@@ -31,7 +31,7 @@ function UI.open(player, data)
     return instance;
 end
 
-function UI:new(x, y, width, height, player, playerIndex, data)
+function UI:new(x, y, width, height, player, playerIndex, data, defaults)
     local o = {};
     o = ISCollapsableWindowJoypad:new(x, y, width, height, player);
     setmetatable(o, self);
@@ -57,6 +57,7 @@ function UI:new(x, y, width, height, player, playerIndex, data)
     };
     o.controls = {}
     o.data = data
+    o.defaults = defaults or {}
     o.moveWithMouse = false;
     o.anchorRight = true
     o.anchorBottom = true
@@ -107,7 +108,43 @@ function UI:createChildren()
 
     self.controls = {}
 
-    local panel = ISPanel:new(w - 110, y, 100, 300 - padding);
+    -- Default config combo boxes
+    local comboW = 200
+    local labelX = padding
+    local comboX = w - comboW - padding
+    local comboH = tools.FONT_HGT_MEDIUM
+
+    local containerLabel = ISLabel:new(labelX, y + 4, tools.FONT_HGT_SMALL, "Default Container Config:", 1, 1, 1, 1,
+        UIFont.Small, true)
+    containerLabel:initialise()
+    containerLabel:instantiate()
+    self:addChild(containerLabel)
+
+    self.controls.containerCombo = ISComboBox:new(comboX, y, comboW, comboH, self, UI.onDefaultChanged)
+    self.controls.containerCombo:initialise()
+    self.controls.containerCombo:instantiate()
+    self.controls.containerCombo:setAnchorRight(true)
+    self.controls.containerCombo.tooltip = "The default config to use on all containers"
+    self:addChild(self.controls.containerCombo)
+
+    y = y + comboH + padding
+
+    local zedLabel = ISLabel:new(labelX, y + 4, tools.FONT_HGT_SMALL, "Default Zed Config:", 1, 1, 1, 1, UIFont.Small,
+        true)
+    zedLabel:initialise()
+    zedLabel:instantiate()
+    self:addChild(zedLabel)
+
+    self.controls.zedCombo = ISComboBox:new(comboX, y, comboW, comboH, self, UI.onDefaultChanged)
+    self.controls.zedCombo:initialise()
+    self.controls.zedCombo:instantiate()
+    self.controls.zedCombo:setAnchorRight(true)
+    -- self.controls.zedCombo:setToolTip("The default config to use on Zeds")
+    self:addChild(self.controls.zedCombo)
+
+    y = y + comboH + padding
+
+    local panel = ISPanel:new(w - 110, y, 100, h - (y - th) - padding);
     panel.drawBorder = false
     panel:initialise();
     panel:instantiate();
@@ -240,6 +277,18 @@ function UI:onCopy()
 
 end
 
+function UI:onDefaultChanged()
+    local containerCombo = self.controls.containerCombo
+    local zedCombo = self.controls.zedCombo
+    local containerConfig = containerCombo.selected > 0 and containerCombo.options[containerCombo.selected] or
+                                Core.consts.defaultConfigKey
+    local zedConfig = zedCombo.selected > 0 and zedCombo.options[zedCombo.selected] or Core.consts.defaultConfigKey
+    sendClientCommand(Core.name, Core.commands.saveDefaults, {
+        containerConfig = containerConfig,
+        zedConfig = zedConfig
+    })
+end
+
 function UI:onEdit()
     local list = self.controls and self.controls.list or self.parent.controls.list
     if list.selected < 0 or list.selected > #list.items then
@@ -291,9 +340,34 @@ function UI:refreshItems()
     self.itemlist = self.data
     self.controls.list:clear()
     for _, v in ipairs(self.data) do
-
         self.controls.list:addItem(v, v);
+    end
 
+    -- Populate default config combos (guard for when called before createChildren)
+    if self.controls.containerCombo then
+        local defaults = self.defaults or {}
+        local containerKey = defaults.containerConfig or Core.consts.defaultConfigKey
+        local zedKey = defaults.zedConfig or Core.consts.defaultConfigKey
+
+        local containerCombo = self.controls.containerCombo
+        local zedCombo = self.controls.zedCombo
+        containerCombo:clear()
+        zedCombo:clear()
+
+        local containerSelected = 1
+        local zedSelected = 1
+        for i, v in ipairs(self.data) do
+            containerCombo:addOption(v)
+            zedCombo:addOption(v)
+            if v == containerKey then
+                containerSelected = i
+            end
+            if v == zedKey then
+                zedSelected = i
+            end
+        end
+        containerCombo.selected = containerSelected
+        zedCombo.selected = zedSelected
     end
 
 end
@@ -305,9 +379,8 @@ function UI:prerender()
     local padding = 10
     local ok = self.controls.new
 
-    local selectedItem = self.controls.list.selected > 0 and
-        self.controls.list.items[self.controls.list.selected] and
-        self.controls.list.items[self.controls.list.selected].item or nil
+    local selectedItem = self.controls.list.selected > 0 and self.controls.list.items[self.controls.list.selected] and
+                             self.controls.list.items[self.controls.list.selected].item or nil
     local isDefault = selectedItem == Core.consts.defaultConfigKey
 
     self.controls.delete:setEnable(self.controls.list.selected > 0 and not isDefault)
@@ -317,12 +390,21 @@ function UI:prerender()
     self.controls.copy:setEnable(self.controls.list.selected > 0)
 
     local panel = self.controls.panel
+    local comboH = tools.FONT_HGT_MEDIUM
+    local comboSectionH = (comboH + padding) * 2
+    local panelY = self:titleBarHeight() + comboSectionH
     panel:setX(self.width - panel.width - padding)
-    panel:setY(self:titleBarHeight() + padding)
-    panel:setHeight(self.height - self:titleBarHeight() - self:resizeWidgetHeight() - padding * 2)
+    panel:setY(panelY)
+    panel:setHeight(self.height - panelY - self:resizeWidgetHeight() - padding)
+
+    local comboW = 200
+    self.controls.containerCombo:setX(self.width - comboW - padding)
+    self.controls.zedCombo:setX(self.width - comboW - padding)
 
     local list = self.controls.list
-    local listw = panel.x - 20
+    list:setY(panelY + tools.HEADER_HGT)
+    list:setWidth(panel.x - padding * 2)
+    list:setHeight(self.height - panelY - self:resizeWidgetHeight() - padding)
 
 end
 

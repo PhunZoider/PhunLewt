@@ -278,6 +278,8 @@ end
 function UI:onOK()
 
     local data = self.data
+    local oldName = data.name
+    local newName = self.controls.name:getText()
 
     data.inherit = self.controls.inherits.selected > 0 and
                        self.controls.inherits.options[self.controls.inherits.selected] or nil
@@ -287,6 +289,11 @@ function UI:onOK()
 
     data.items = self.controls.items.data.items
     data.categories = self.controls.categories.data.categories
+
+    if newName and newName ~= "" and newName ~= oldName then
+        data.oldName = oldName
+        data.name = newName
+    end
 
     sendClientCommand(Core.name, Core.commands.saveZoneData, data)
     self:close()

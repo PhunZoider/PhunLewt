@@ -5,7 +5,7 @@ Events[Core.events.OnReady].Add(function()
 
     local activeMods = getActivatedMods()
 
-    if activeMods:contains("phunzones2") or activeMods:contains("phunzones2test") then
+    if activeMods:contains("\\phunzones2") or activeMods:contains("\\phunzones2test") then
         require "PhunZones/core"
         local PZ = PhunZones
 

@@ -7,13 +7,6 @@ local PZ = PhunZones
 local getGameTime = getGameTime
 local getSandboxOptions = getSandboxOptions
 
-function Core.removeItemsFromZed(container)
-
-    return Core.removeItemsFromContainer(container, true)
-end
-
-local separateZedConfig = nil
-
 function Core.removeItemsFromContainer(container, isZed)
 
     local categoryLookup = Core.getCategoryLookup()
@@ -43,13 +36,16 @@ function Core.removeItemsFromContainer(container, isZed)
             local lewtkey = nil
             if PZ then
                 local z = PZ.getLocation(square)
-                if separateZedConfig == nil then
-                    separateZedConfig = Core.getOption("SeparateZedConfig", false)
-                end
-                if separateZedConfig and z and z.zlewtkey and z.zlewtkey ~= "" then
-                    lewtkey = z.zlewtkey
-                elseif z and z.lewtkey and z.lewtkey ~= "" then
-                    lewtkey = z.lewtkey
+                if z then
+                    if zed then
+                        if z.zlewtkey and z.zlewtkey ~= "" and z.zlewtkey ~= "none" then
+                            lewtkey = z.zlewtkey
+                        end
+                    else
+                        if z.lewtkey and z.lewtkey ~= "" and z.lewtkey ~= "none" then
+                            lewtkey = z.lewtkey
+                        end
+                    end
                 end
             end
 
@@ -62,7 +58,18 @@ function Core.removeItemsFromContainer(container, isZed)
                 md.PhunLewtChecked = true
             end
 
-            local lookup = Core.resolvedData[lewtkey] or Core.resolvedData[Core.consts.defaultConfigKey] or {
+            -- Resolve config: PhunZones lewtkey > admin default for type > hardcoded "default"
+            local configKey = lewtkey
+            if not configKey then
+                local defaults = Core.defaults or {}
+                if zed and defaults.zedConfig then
+                    configKey = defaults.zedConfig
+                elseif not zed and defaults.containerConfig then
+                    configKey = defaults.containerConfig
+                end
+            end
+            local lookup = (configKey and Core.resolvedData[configKey]) or
+                               Core.resolvedData[Core.consts.defaultConfigKey] or {
                 items = {},
                 categories = {}
             }
@@ -92,7 +99,7 @@ function Core.removeItemsFromContainer(container, isZed)
                 end
                 print("PhunLewt " .. tostring(container:getType()) .. " at " .. tostring(square:getX()) .. ", " ..
                           tostring(square:getY()) .. ", " .. tostring(square:getZ()) .. ", config: " ..
-                          tostring(lewtkey) .. adjustmentText .. " default reduction: " .. tostring(defaultReduction))
+                          tostring(configKey) .. adjustmentText .. " default reduction: " .. tostring(defaultReduction))
 
             end
 
@@ -160,7 +167,8 @@ function Core:saveChanges(data)
     end
     Core.tools.saveTable(Core.consts.luaDataFileName, {
         groups = Core.groups or {},
-        data = data
+        data = data,
+        defaults = Core.defaults or {}
     })
     Core:buildLookup()
 end

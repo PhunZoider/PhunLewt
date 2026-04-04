@@ -17,7 +17,8 @@ PhunLewt = {
         saveZoneData = "saveZoneData",
         debug = "debug",
         delete = "delete",
-        copy = "copy"
+        copy = "copy",
+        saveDefaults = "saveDefaults"
     },
     events = {
         OnReady = "PhunLewtOnReady",

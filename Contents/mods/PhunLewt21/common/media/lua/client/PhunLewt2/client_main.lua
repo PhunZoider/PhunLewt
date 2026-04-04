@@ -14,10 +14,8 @@ function Core.editZoneData(player, data)
     end)
 end
 
-function Core.editConfigs(player, data)
-    Core.ui.configs.open(player, data, function(zone)
-
-    end)
+function Core.editConfigs(player, data, defaults)
+    Core.ui.configs.open(player, data, defaults)
 end
 
 function Core.showLoadingModal()

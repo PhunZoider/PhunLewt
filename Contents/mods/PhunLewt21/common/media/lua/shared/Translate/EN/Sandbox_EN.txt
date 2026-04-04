@@ -3,10 +3,4 @@ Sandbox_EN = {
     Sandbox_PhunLewt_Debug = "Debug",
     Sandbox_PhunLewt_Debug_tooltip = "Print verbose output into logs. Useful for... well, debugging",
 
-    Sandbox_PhunLewt_Zeds = "Remove from Zeds"
-    Sandbox_PhunLewt_Zed_tooltip = "Applies your conifigs to dead zed inventory. Requires restart."
-
-    Sandbox_PhunLewt_SeparateZedConfig = "Separate Zed Configs"
-    Sandbox_PhunLewt_SeparateZedConfig_tooltip = "Have different configs for containers and zeds (requires PhunZones 2 and the Remove from Zeds option ticked). Requires restart"
-
 }

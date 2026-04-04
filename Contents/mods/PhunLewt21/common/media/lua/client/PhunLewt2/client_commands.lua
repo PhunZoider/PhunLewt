@@ -29,7 +29,7 @@ Commands[Core.commands.requestNames] = function(args)
     if player then
         args.username = nil
         Core.configNames = args.names or {}
-        Core.editConfigs(player, args.names)
+        Core.editConfigs(player, args.names, args.defaults or {})
         Core.hideLoadingModal()
     end
 end

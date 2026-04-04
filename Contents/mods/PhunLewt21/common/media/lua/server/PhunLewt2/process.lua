@@ -87,6 +87,7 @@ function Core:getSavedData()
     -- load Lua/PhunLewt.lua data into ModData
     local data = {}
     local d = Core.tools.loadTable(Core.consts.luaDataFileName)
+    Core.defaults = (d and d.defaults) or {}
     if d == nil then
         print("PhunLewt: missing ./lua/" .. Core.consts.luaDataFileName ..
                   ", this is normal if you haven't modified any zones")
