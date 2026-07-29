@@ -84,7 +84,7 @@ function Core:getSavedData()
     -- cache categories for all items
     Core.getCategoryLookup()
 
-    -- load Lua/PhunLewt.lua data into ModData
+    -- load Lua/PhunLewt.txt data into ModData
     local data = {}
     local d = Core.tools.loadTable(Core.consts.luaDataFileName)
     Core.defaults = (d and d.defaults) or {}

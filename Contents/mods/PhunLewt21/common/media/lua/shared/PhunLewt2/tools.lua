@@ -128,9 +128,10 @@ function tools.getCategory(item)
     elseif item.getTypeString and item:getTypeString() == "Literature" then
         if string.len(item:getSkillTrained()) > 0 then
             category = "LitS";
-        elseif item:getTeachedRecipes() and not item:getTeachedRecipes():isEmpty() then
+        elseif item.getTeachedRecipes and item:getTeachedRecipes() and not item:getTeachedRecipes():isEmpty() then
             category = "LitR";
-        elseif item:getStressChange() ~= 0 or item:getBoredomChange() ~= 0 or item:getUnhappyChange() ~= 0 then
+        elseif item.getStressChange and item:getStressChange() ~= 0 or item:getBoredomChange() ~= 0 or
+            item:getUnhappyChange() ~= 0 then
             category = "LitE";
         else
             category = "LitW";
