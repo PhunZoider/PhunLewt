@@ -4,7 +4,8 @@ PhunLewt = {
         itemType = {
             items = "items"
         },
-        luaDataFileName = "PhunLewt.txt",
+        luaDataFileName = "PhunLewt.json",
+        legacyLuaDataFileName = "PhunLewt.txt",
         defaultConfigKey = "default"
     },
     data = {},
