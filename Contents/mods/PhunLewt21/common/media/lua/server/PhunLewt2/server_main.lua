@@ -9,6 +9,14 @@ local getSandboxOptions = getSandboxOptions
 
 function Core.removeItemsFromContainer(container, isZed)
 
+    -- 42.20 fires OnFillContainer for "Zombie Bag" loot with an
+    -- ItemPickerJava$ItemPickerContainer (a loot distribution definition) instead of
+    -- the bag's ItemContainer. That class isn't exposed to lua, so *any* index on it
+    -- throws - test the type before touching it rather than probing for a method.
+    if not container or not instanceof(container, "ItemContainer") then
+        return
+    end
+
     local categoryLookup = Core.getCategoryLookup()
 
     local square = container:getSourceGrid()
