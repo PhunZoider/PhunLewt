@@ -84,13 +84,25 @@ function Core:getSavedData()
     -- cache categories for all items
     Core.getCategoryLookup()
 
-    -- load Lua/PhunLewt.txt data into ModData
+    -- load Lua/PhunLewt.json data into ModData
     local data = {}
     local d = Core.tools.loadTable(Core.consts.luaDataFileName)
     Core.defaults = (d and d.defaults) or {}
     if d == nil then
-        print("PhunLewt: missing ./lua/" .. Core.consts.luaDataFileName ..
-                  ", this is normal if you haven't modified any zones")
+        -- Build 42.20.4 removed loadstring, so the old Lua-source .txt config can
+        -- no longer be read by the game. Point admins at the converter rather than
+        -- silently starting up with no customisations.
+        if Core.tools.fileExists(Core.consts.legacyLuaDataFileName) then
+            print("PhunLewt: found pre-42.20.4 config at ./lua/" .. Core.consts.legacyLuaDataFileName ..
+                      " but no ./lua/" .. Core.consts.luaDataFileName)
+            print("PhunLewt: build 42.20.4 removed loadstring, so .txt configs can no longer be loaded")
+            print("PhunLewt: convert it at https://phunzoider.github.io/PhunZones/converter/ then save the")
+            print("PhunLewt: result as ./lua/" .. Core.consts.luaDataFileName ..
+                      " beside the old file and restart")
+        else
+            print("PhunLewt: missing ./lua/" .. Core.consts.luaDataFileName ..
+                      ", this is normal if you haven't modified any zones")
+        end
         ModData.add(Core.name, {})
     elseif d.data then
 

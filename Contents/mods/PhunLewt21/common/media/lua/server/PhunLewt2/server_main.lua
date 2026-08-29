@@ -7,13 +7,79 @@ local PZ = PhunZones
 local getGameTime = getGameTime
 local getSandboxOptions = getSandboxOptions
 
+-- Applies a resolved config to a container's items, recursing into any bag that
+-- survives the roll. Build 42 does fire OnFillContainer for the contents of a
+-- spawned bag, but hands it ItemPickerJava$ItemPickerContainer -- the distribution
+-- definition rather than the container -- so those items are unreachable from the
+-- event itself, and can only be found from the container holding the bag. The
+-- parent's event fires after its bags are filled, so they are populated by now.
+local function applyReduction(container, ctx, depth)
+
+    local items = container and container.getItems and container:getItems()
+    if not items or items:size() == 0 then
+        return 0
+    end
+
+    local lookup = ctx.lookup
+    local indent = string.rep("   ", depth + 1)
+    local removed = 0
+
+    for i = items:size() - 1, 0, -1 do
+        local item = items:get(i)
+        if item and item.getFullType then
+            local name = item:getFullType()
+            local category = ctx.categoryLookup[name] or ""
+            -- only check item if it has a category and type
+            local chance =
+                (lookup.items and lookup.items[name]) or (lookup.categories and lookup.categories[category]) or nil
+
+            if chance == nil then
+                chance = ctx.defaultReduction
+            end
+
+            local kept = true
+            if chance ~= nil and chance > 0 then
+                local rand = ZombRand(100)
+                if ctx.doDebug then
+                    print(indent .. "* " .. (name or "???") .. " (" .. (category or "???") .. "): " .. ": " ..
+                              tostring(chance) .. "%, adjusted to " ..
+                              Core.tools.formatWholeNumber(chance * ctx.adjustment) .. "%, rolled: " .. tostring(rand) ..
+                              (rand < (chance * ctx.adjustment) and " = removing" or " = keeping"))
+                end
+
+                if rand < (chance * ctx.adjustment) then
+                    container:Remove(item)
+                    if ctx.isDeadBody then
+                        sendRemoveItemFromContainer(container, item)
+                    end
+                    removed = removed + 1
+                    kept = false
+                end
+            elseif ctx.doDebug then
+                print(indent .. "* no reduction for " .. (name or "???") .. ". Keeping.")
+            end
+
+            -- a bag that survived still holds loot of its own
+            if kept and depth < ctx.maxDepth and item.getItemContainer and instanceof(item, "InventoryContainer") then
+                local inner = item:getItemContainer()
+                if inner then
+                    if ctx.doDebug then
+                        print(indent .. "> descending into " .. (name or "???"))
+                    end
+                    removed = removed + applyReduction(inner, ctx, depth + 1)
+                end
+            end
+        end
+    end
+
+    return removed
+end
+
 function Core.removeItemsFromContainer(container, isZed)
 
-    -- 42.20 fires OnFillContainer for "Zombie Bag" loot with an
-    -- ItemPickerJava$ItemPickerContainer (a loot distribution definition) instead of
-    -- the bag's ItemContainer. That class isn't exposed to lua, so *any* index on it
-    -- throws - test the type before touching it rather than probing for a method.
-    if not container or not instanceof(container, "ItemContainer") then
+    -- OnFillContainer can fire with an ItemPickerJava$ItemPickerContainer (or another
+    -- non-ItemContainer wrapper) which has none of the methods used below.
+    if not container or not container.getSourceGrid or not container.getParent or not container.getItems then
         return
     end
 
@@ -58,8 +124,8 @@ function Core.removeItemsFromContainer(container, isZed)
             end
 
             -- Zed inventory: prevent duplicate processing on the same corpse
-            if zed then
-                local md = container:getParent():getModData()
+            if zed and parent then
+                local md = parent:getModData()
                 if md.PhunLewtChecked then
                     return
                 end
@@ -111,39 +177,16 @@ function Core.removeItemsFromContainer(container, isZed)
 
             end
 
-            for i = items:size() - 1, 0, -1 do
-                local item = items:get(i)
-                if item and item.getFullType then
-                    local name = item:getFullType()
-                    local category = categoryLookup[name] or ""
-                    -- only check item if it has a category and type
-                    local chance = (lookup.items and lookup.items[name]) or
-                                       (lookup.categories and lookup.categories[category]) or nil
-
-                    if chance == nil then
-                        chance = defaultReduction
-                    end
-                    if chance ~= nil and chance > 0 then
-                        local rand = ZombRand(100)
-                        if doDebug then
-                            print("   * " .. (name or "???") .. " (" .. (category or "???") .. "): " .. ": " ..
-                                      tostring(chance) .. "%, adjusted to " ..
-                                      Core.tools.formatWholeNumber(chance * adjustment) .. "%, rolled: " ..
-                                      tostring(rand) .. (rand < (chance * adjustment) and " = removing" or " = keeping"))
-                        end
-
-                        if rand < (chance * adjustment) then
-                            container:Remove(item)
-                            if isDeadBody then
-                                sendRemoveItemFromContainer(container, item)
-                            end
-                            removed = removed + 1
-                        end
-                    elseif doDebug then
-                        print("   * no reduction for " .. (name or "???") .. ". Keeping.")
-                    end
-                end
-            end
+            -- nested bags share the parent config: they have no square of their own
+            removed = applyReduction(container, {
+                categoryLookup = categoryLookup,
+                lookup = lookup,
+                defaultReduction = defaultReduction,
+                adjustment = adjustment,
+                doDebug = doDebug,
+                isDeadBody = isDeadBody,
+                maxDepth = Core.consts.maxContainerDepth or 3
+            }, 0)
         end
 
         if removed > 0 and container:isEmpty() then

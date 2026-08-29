@@ -4,8 +4,11 @@ PhunLewt = {
         itemType = {
             items = "items"
         },
-        luaDataFileName = "PhunLewt.txt",
-        defaultConfigKey = "default"
+        luaDataFileName = "PhunLewt.json",
+        legacyLuaDataFileName = "PhunLewt.txt",
+        defaultConfigKey = "default",
+        -- how many levels of bag-inside-bag to reduce loot in
+        maxContainerDepth = 3
     },
     data = {},
     commands = {

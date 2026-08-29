@@ -10,3 +10,6 @@ liveworkshop.txt
 CLAUDE.md
 .claude
 .gitignore
+.html
+deploy.cmd
+converter

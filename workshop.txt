@@ -3,6 +3,22 @@ id=3676250472
 title=PhunLewt 2.1
 description=Fine tune loot spawns and respawns by area and time by reducing their chance of spawn
 description=
+description=[h1]B42.20.4: Migrating your customisations[/h1]
+description=
+description=Build 42.20.4 removed the Lua functions this mod used to read and write its configuration file. Any customisations you already have in PhunLewt.txt will need to be converted to PhunLewt.json, or re-created from scratch in the editor.
+description=
+description=[b]Single-player[/b]
+description=1. Find your customisations at %UserProfile%/Zomboid/Lua/PhunLewt.txt.
+description=2. Open the [url=https://phunzoider.github.io/PhunZones/converter/]Phun configuration converter[/url].
+description=3. Select or drag PhunLewt.txt into the converter and download the resulting PhunLewt.json file.
+description=4. Place PhunLewt.json in the same %UserProfile%/Zomboid/Lua folder.
+description=5. Keep the old PhunLewt.txt until you have confirmed your configs load correctly.
+description=
+description=[b]Multiplayer[/b]
+description=Your customisations are on the server at %UserProfile%/Zomboid/Server/<server-name>/Lua/PhunLewt.txt. Convert it with the same tool and place PhunLewt.json beside the old file. Clients do not have the server's configuration file, so players do not need to do anything.
+description=
+description=The converter runs entirely in your browser; your configuration files are never uploaded. If you skip this step the mod starts with no customisations and logs a reminder to the console; nothing is deleted.
+description=
 description=[h1]Setup[/h1]
 description=Open the configs window by clicking the PhunLewts button in the Admin or Debug window
 description=[url=https://ibb.co/Vc657PcM][img]https://i.ibb.co/zTdDy0TP/configs-cropped.png[/img][/url]
